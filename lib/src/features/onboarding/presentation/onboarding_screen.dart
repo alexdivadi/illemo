@@ -2,12 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
-import 'package:starter_architecture_flutter_firebase/src/common_widgets/primary_button.dart';
-import 'package:starter_architecture_flutter_firebase/src/common_widgets/responsive_center.dart';
-import 'package:starter_architecture_flutter_firebase/src/constants/app_sizes.dart';
-import 'package:starter_architecture_flutter_firebase/src/features/onboarding/presentation/onboarding_controller.dart';
-import 'package:starter_architecture_flutter_firebase/src/localization/string_hardcoded.dart';
-import 'package:starter_architecture_flutter_firebase/src/routing/app_router.dart';
+import 'package:illemo/src/common_widgets/primary_button.dart';
+import 'package:illemo/src/common_widgets/responsive_center.dart';
+import 'package:illemo/src/constants/app_sizes.dart';
+import 'package:illemo/src/features/onboarding/presentation/onboarding_controller.dart';
+import 'package:illemo/src/localization/string_hardcoded.dart';
+import 'package:illemo/src/routing/app_router.dart';
 
 class OnboardingScreen extends ConsumerWidget {
   const OnboardingScreen({super.key});
@@ -42,9 +42,7 @@ class OnboardingScreen extends ConsumerWidget {
               onPressed: state.isLoading
                   ? null
                   : () async {
-                      await ref
-                          .read(onboardingControllerProvider.notifier)
-                          .completeOnboarding();
+                      await ref.read(onboardingControllerProvider.notifier).completeOnboarding();
                       if (context.mounted) {
                         // go to sign in page after completing onboarding
                         context.goNamed(AppRoute.signIn.name);

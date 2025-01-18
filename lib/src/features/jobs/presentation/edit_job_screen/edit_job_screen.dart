@@ -3,11 +3,11 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:starter_architecture_flutter_firebase/src/common_widgets/responsive_center.dart';
-import 'package:starter_architecture_flutter_firebase/src/constants/breakpoints.dart';
-import 'package:starter_architecture_flutter_firebase/src/features/jobs/domain/job.dart';
-import 'package:starter_architecture_flutter_firebase/src/features/jobs/presentation/edit_job_screen/edit_job_screen_controller.dart';
-import 'package:starter_architecture_flutter_firebase/src/utils/async_value_ui.dart';
+import 'package:illemo/src/common_widgets/responsive_center.dart';
+import 'package:illemo/src/constants/breakpoints.dart';
+import 'package:illemo/src/features/jobs/domain/job.dart';
+import 'package:illemo/src/features/jobs/presentation/edit_job_screen/edit_job_screen_controller.dart';
+import 'package:illemo/src/utils/async_value_ui.dart';
 
 class EditJobScreen extends ConsumerStatefulWidget {
   const EditJobScreen({super.key, this.jobId, this.job});
@@ -44,13 +44,12 @@ class _EditJobPageState extends ConsumerState<EditJobScreen> {
 
   Future<void> _submit() async {
     if (_validateAndSaveForm()) {
-      final success =
-          await ref.read(editJobScreenControllerProvider.notifier).submit(
-                jobId: widget.jobId,
-                oldJob: widget.job,
-                name: _name ?? '',
-                ratePerHour: _ratePerHour ?? 0,
-              );
+      final success = await ref.read(editJobScreenControllerProvider.notifier).submit(
+            jobId: widget.jobId,
+            oldJob: widget.job,
+            name: _name ?? '',
+            ratePerHour: _ratePerHour ?? 0,
+          );
       if (success && mounted) {
         context.pop();
       }
@@ -112,8 +111,7 @@ class _EditJobPageState extends ConsumerState<EditJobScreen> {
         decoration: const InputDecoration(labelText: 'Job name'),
         keyboardAppearance: Brightness.light,
         initialValue: _name,
-        validator: (value) =>
-            (value ?? '').isNotEmpty ? null : 'Name can\'t be empty',
+        validator: (value) => (value ?? '').isNotEmpty ? null : 'Name can\'t be empty',
         onSaved: (value) => _name = value,
       ),
       TextFormField(

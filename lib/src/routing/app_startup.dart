@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import 'package:starter_architecture_flutter_firebase/src/constants/app_sizes.dart';
-import 'package:starter_architecture_flutter_firebase/src/features/onboarding/data/onboarding_repository.dart';
+import 'package:illemo/src/constants/app_sizes.dart';
+import 'package:illemo/src/features/onboarding/data/onboarding_repository.dart';
 
 part 'app_startup.g.dart';
 
@@ -56,8 +56,7 @@ class AppStartupLoadingWidget extends StatelessWidget {
 
 /// Widget to show if initialization fails
 class AppStartupErrorWidget extends StatelessWidget {
-  const AppStartupErrorWidget(
-      {super.key, required this.message, required this.onRetry});
+  const AppStartupErrorWidget({super.key, required this.message, required this.onRetry});
   final String message;
   final VoidCallback onRetry;
 

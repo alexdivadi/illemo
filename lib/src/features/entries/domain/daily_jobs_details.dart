@@ -1,4 +1,4 @@
-import 'package:starter_architecture_flutter_firebase/src/features/entries/domain/entry_job.dart';
+import 'package:illemo/src/features/entries/domain/entry_job.dart';
 
 /// Temporary model class to store the time tracked and pay for a job
 class JobDetails {
@@ -18,9 +18,8 @@ class DailyJobsDetails {
   final DateTime date;
   final List<JobDetails> jobsDetails;
 
-  double get pay => jobsDetails
-      .map((jobDuration) => jobDuration.pay)
-      .reduce((value, element) => value + element);
+  double get pay =>
+      jobsDetails.map((jobDuration) => jobDuration.pay).reduce((value, element) => value + element);
 
   double get duration => jobsDetails
       .map((jobDuration) => jobDuration.durationInHours)
@@ -30,8 +29,8 @@ class DailyJobsDetails {
   static Map<DateTime, List<EntryJob>> _entriesByDate(List<EntryJob> entries) {
     final Map<DateTime, List<EntryJob>> map = {};
     for (final entryJob in entries) {
-      final entryDayStart = DateTime(entryJob.entry.start.year,
-          entryJob.entry.start.month, entryJob.entry.start.day);
+      final entryDayStart =
+          DateTime(entryJob.entry.start.year, entryJob.entry.start.month, entryJob.entry.start.day);
       if (map[entryDayStart] == null) {
         map[entryDayStart] = [entryJob];
       } else {

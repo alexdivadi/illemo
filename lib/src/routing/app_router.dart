@@ -1,22 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:riverpod/riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import 'package:starter_architecture_flutter_firebase/src/features/authentication/data/firebase_auth_repository.dart';
-import 'package:starter_architecture_flutter_firebase/src/features/authentication/presentation/custom_profile_screen.dart';
-import 'package:starter_architecture_flutter_firebase/src/features/authentication/presentation/custom_sign_in_screen.dart';
-import 'package:starter_architecture_flutter_firebase/src/features/entries/presentation/entries_screen.dart';
-import 'package:starter_architecture_flutter_firebase/src/features/entries/domain/entry.dart';
-import 'package:starter_architecture_flutter_firebase/src/features/jobs/domain/job.dart';
-import 'package:starter_architecture_flutter_firebase/src/features/entries/presentation/entry_screen/entry_screen.dart';
-import 'package:starter_architecture_flutter_firebase/src/features/jobs/presentation/job_entries_screen/job_entries_screen.dart';
+import 'package:illemo/src/features/authentication/data/firebase_auth_repository.dart';
+import 'package:illemo/src/features/authentication/presentation/custom_profile_screen.dart';
+import 'package:illemo/src/features/authentication/presentation/custom_sign_in_screen.dart';
+import 'package:illemo/src/features/entries/presentation/entries_screen.dart';
+import 'package:illemo/src/features/entries/domain/entry.dart';
+import 'package:illemo/src/features/jobs/domain/job.dart';
+import 'package:illemo/src/features/entries/presentation/entry_screen/entry_screen.dart';
+import 'package:illemo/src/features/jobs/presentation/job_entries_screen/job_entries_screen.dart';
 import 'package:go_router/go_router.dart';
-import 'package:starter_architecture_flutter_firebase/src/features/jobs/presentation/edit_job_screen/edit_job_screen.dart';
-import 'package:starter_architecture_flutter_firebase/src/features/jobs/presentation/jobs_screen/jobs_screen.dart';
-import 'package:starter_architecture_flutter_firebase/src/features/onboarding/data/onboarding_repository.dart';
-import 'package:starter_architecture_flutter_firebase/src/features/onboarding/presentation/onboarding_screen.dart';
-import 'package:starter_architecture_flutter_firebase/src/routing/go_router_refresh_stream.dart';
-import 'package:starter_architecture_flutter_firebase/src/routing/not_found_screen.dart';
-import 'package:starter_architecture_flutter_firebase/src/routing/scaffold_with_nested_navigation.dart';
+import 'package:illemo/src/features/jobs/presentation/edit_job_screen/edit_job_screen.dart';
+import 'package:illemo/src/features/jobs/presentation/jobs_screen/jobs_screen.dart';
+import 'package:illemo/src/features/onboarding/data/onboarding_repository.dart';
+import 'package:illemo/src/features/onboarding/presentation/onboarding_screen.dart';
+import 'package:illemo/src/routing/go_router_refresh_stream.dart';
+import 'package:illemo/src/routing/not_found_screen.dart';
+import 'package:illemo/src/routing/scaffold_with_nested_navigation.dart';
 
 part 'app_router.g.dart';
 
@@ -48,8 +48,7 @@ GoRouter goRouter(Ref ref) {
     navigatorKey: _rootNavigatorKey,
     debugLogDiagnostics: true,
     redirect: (context, state) {
-      final onboardingRepository =
-          ref.read(onboardingRepositoryProvider).requireValue;
+      final onboardingRepository = ref.read(onboardingRepositoryProvider).requireValue;
       final didCompleteOnboarding = onboardingRepository.isOnboardingComplete();
       final path = state.uri.path;
       if (!didCompleteOnboarding) {

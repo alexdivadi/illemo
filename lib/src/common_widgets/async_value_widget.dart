@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:starter_architecture_flutter_firebase/src/common_widgets/error_message_widget.dart';
+import 'package:illemo/src/common_widgets/error_message_widget.dart';
 
 class AsyncValueWidget<T> extends StatelessWidget {
   const AsyncValueWidget({super.key, required this.value, required this.data});
@@ -18,8 +18,7 @@ class AsyncValueWidget<T> extends StatelessWidget {
 }
 
 class ScaffoldAsyncValueWidget<T> extends StatelessWidget {
-  const ScaffoldAsyncValueWidget(
-      {super.key, required this.value, required this.data});
+  const ScaffoldAsyncValueWidget({super.key, required this.value, required this.data});
   final AsyncValue<T> value;
   final Widget Function(T) data;
 

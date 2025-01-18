@@ -1,9 +1,9 @@
 import 'dart:async';
 
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import 'package:starter_architecture_flutter_firebase/src/features/authentication/data/firebase_auth_repository.dart';
-import 'package:starter_architecture_flutter_firebase/src/features/jobs/data/jobs_repository.dart';
-import 'package:starter_architecture_flutter_firebase/src/features/jobs/domain/job.dart';
+import 'package:illemo/src/features/authentication/data/firebase_auth_repository.dart';
+import 'package:illemo/src/features/jobs/data/jobs_repository.dart';
+import 'package:illemo/src/features/jobs/domain/job.dart';
 
 part 'jobs_screen_controller.g.dart';
 
@@ -21,7 +21,6 @@ class JobsScreenController extends _$JobsScreenController {
     }
     final repository = ref.read(jobsRepositoryProvider);
     state = const AsyncLoading();
-    state = await AsyncValue.guard(
-        () => repository.deleteJob(uid: currentUser.uid, jobId: job.id));
+    state = await AsyncValue.guard(() => repository.deleteJob(uid: currentUser.uid, jobId: job.id));
   }
 }

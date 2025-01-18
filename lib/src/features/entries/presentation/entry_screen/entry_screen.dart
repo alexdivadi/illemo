@@ -3,15 +3,15 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:starter_architecture_flutter_firebase/src/common_widgets/date_time_picker.dart';
-import 'package:starter_architecture_flutter_firebase/src/common_widgets/responsive_center.dart';
-import 'package:starter_architecture_flutter_firebase/src/constants/app_sizes.dart';
-import 'package:starter_architecture_flutter_firebase/src/constants/breakpoints.dart';
-import 'package:starter_architecture_flutter_firebase/src/features/entries/domain/entry.dart';
-import 'package:starter_architecture_flutter_firebase/src/features/jobs/domain/job.dart';
-import 'package:starter_architecture_flutter_firebase/src/features/entries/presentation/entry_screen/entry_screen_controller.dart';
-import 'package:starter_architecture_flutter_firebase/src/utils/async_value_ui.dart';
-import 'package:starter_architecture_flutter_firebase/src/utils/format.dart';
+import 'package:illemo/src/common_widgets/date_time_picker.dart';
+import 'package:illemo/src/common_widgets/responsive_center.dart';
+import 'package:illemo/src/constants/app_sizes.dart';
+import 'package:illemo/src/constants/breakpoints.dart';
+import 'package:illemo/src/features/entries/domain/entry.dart';
+import 'package:illemo/src/features/jobs/domain/job.dart';
+import 'package:illemo/src/features/entries/presentation/entry_screen/entry_screen_controller.dart';
+import 'package:illemo/src/utils/async_value_ui.dart';
+import 'package:illemo/src/utils/format.dart';
 
 class EntryScreen extends ConsumerStatefulWidget {
   const EntryScreen({super.key, required this.jobId, this.entryId, this.entry});
@@ -30,10 +30,10 @@ class _EntryPageState extends ConsumerState<EntryScreen> {
   late TimeOfDay _endTime;
   late String _comment;
 
-  DateTime get start => DateTime(_startDate.year, _startDate.month,
-      _startDate.day, _startTime.hour, _startTime.minute);
-  DateTime get end => DateTime(_endDate.year, _endDate.month, _endDate.day,
-      _endTime.hour, _endTime.minute);
+  DateTime get start => DateTime(
+      _startDate.year, _startDate.month, _startDate.day, _startTime.hour, _startTime.minute);
+  DateTime get end =>
+      DateTime(_endDate.year, _endDate.month, _endDate.day, _endTime.hour, _endTime.minute);
 
   @override
   void initState() {
@@ -50,14 +50,13 @@ class _EntryPageState extends ConsumerState<EntryScreen> {
   }
 
   Future<void> _setEntryAndDismiss() async {
-    final success =
-        await ref.read(entryScreenControllerProvider.notifier).submit(
-              entryId: widget.entryId,
-              jobId: widget.jobId,
-              start: start,
-              end: end,
-              comment: _comment,
-            );
+    final success = await ref.read(entryScreenControllerProvider.notifier).submit(
+          entryId: widget.entryId,
+          jobId: widget.jobId,
+          start: start,
+          end: end,
+          comment: _comment,
+        );
     if (success && mounted) {
       context.pop();
     }

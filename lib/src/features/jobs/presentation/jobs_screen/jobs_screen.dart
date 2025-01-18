@@ -2,12 +2,12 @@ import 'package:firebase_ui_firestore/firebase_ui_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:starter_architecture_flutter_firebase/src/constants/strings.dart';
-import 'package:starter_architecture_flutter_firebase/src/features/jobs/data/jobs_repository.dart';
-import 'package:starter_architecture_flutter_firebase/src/features/jobs/domain/job.dart';
-import 'package:starter_architecture_flutter_firebase/src/features/jobs/presentation/jobs_screen/jobs_screen_controller.dart';
-import 'package:starter_architecture_flutter_firebase/src/routing/app_router.dart';
-import 'package:starter_architecture_flutter_firebase/src/utils/async_value_ui.dart';
+import 'package:illemo/src/constants/strings.dart';
+import 'package:illemo/src/features/jobs/data/jobs_repository.dart';
+import 'package:illemo/src/features/jobs/domain/job.dart';
+import 'package:illemo/src/features/jobs/presentation/jobs_screen/jobs_screen_controller.dart';
+import 'package:illemo/src/routing/app_router.dart';
+import 'package:illemo/src/utils/async_value_ui.dart';
 
 class JobsScreen extends StatelessWidget {
   const JobsScreen({super.key});
@@ -37,17 +37,15 @@ class JobsScreen extends StatelessWidget {
             errorBuilder: (context, error, stackTrace) => Center(
               child: Text(error.toString()),
             ),
-            loadingBuilder: (context) =>
-                const Center(child: CircularProgressIndicator()),
+            loadingBuilder: (context) => const Center(child: CircularProgressIndicator()),
             itemBuilder: (context, doc) {
               final job = doc.data();
               return Dismissible(
                 key: Key('job-${job.id}'),
                 background: Container(color: Colors.red),
                 direction: DismissDirection.endToStart,
-                onDismissed: (direction) => ref
-                    .read(jobsScreenControllerProvider.notifier)
-                    .deleteJob(job),
+                onDismissed: (direction) =>
+                    ref.read(jobsScreenControllerProvider.notifier).deleteJob(job),
                 child: JobListTile(
                   job: job,
                   onTap: () => context.goNamed(

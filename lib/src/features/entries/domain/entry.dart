@@ -1,5 +1,5 @@
 import 'package:equatable/equatable.dart';
-import 'package:starter_architecture_flutter_firebase/src/features/jobs/domain/job.dart';
+import 'package:illemo/src/features/jobs/domain/job.dart';
 
 typedef EntryID = String;
 
@@ -23,8 +23,7 @@ class Entry extends Equatable {
   @override
   bool get stringify => true;
 
-  double get durationInHours =>
-      end.difference(start).inMinutes.toDouble() / 60.0;
+  double get durationInHours => end.difference(start).inMinutes.toDouble() / 60.0;
 
   factory Entry.fromMap(Map<dynamic, dynamic> value, EntryID id) {
     final startMilliseconds = value['start'] as int;

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:starter_architecture_flutter_firebase/src/constants/app_sizes.dart';
-import 'package:starter_architecture_flutter_firebase/src/utils/format.dart';
-import 'package:starter_architecture_flutter_firebase/src/features/entries/domain/entry.dart';
-import 'package:starter_architecture_flutter_firebase/src/features/jobs/domain/job.dart';
+import 'package:illemo/src/constants/app_sizes.dart';
+import 'package:illemo/src/utils/format.dart';
+import 'package:illemo/src/features/entries/domain/entry.dart';
+import 'package:illemo/src/features/jobs/domain/job.dart';
 
 class EntryListItem extends StatelessWidget {
   const EntryListItem({
@@ -51,8 +51,7 @@ class EntryListItem extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
         Row(children: <Widget>[
-          Text(dayOfWeek,
-              style: const TextStyle(fontSize: 18.0, color: Colors.grey)),
+          Text(dayOfWeek, style: const TextStyle(fontSize: 18.0, color: Colors.grey)),
           gapW16,
           Text(startDate, style: const TextStyle(fontSize: 18.0)),
           if (job.ratePerHour > 0.0) ...<Widget>[

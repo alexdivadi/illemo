@@ -1,10 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import 'package:starter_architecture_flutter_firebase/src/features/authentication/data/firebase_auth_repository.dart';
-import 'package:starter_architecture_flutter_firebase/src/features/authentication/domain/app_user.dart';
-import 'package:starter_architecture_flutter_firebase/src/features/entries/domain/entry.dart';
-import 'package:starter_architecture_flutter_firebase/src/features/jobs/domain/job.dart';
+import 'package:illemo/src/features/authentication/data/firebase_auth_repository.dart';
+import 'package:illemo/src/features/authentication/domain/app_user.dart';
+import 'package:illemo/src/features/entries/domain/entry.dart';
+import 'package:illemo/src/features/jobs/domain/job.dart';
 
 part 'entries_repository.g.dart';
 
@@ -12,8 +12,7 @@ class EntriesRepository {
   const EntriesRepository(this._firestore);
   final FirebaseFirestore _firestore;
 
-  static String entryPath(String uid, String entryId) =>
-      'users/$uid/entries/$entryId';
+  static String entryPath(String uid, String entryId) => 'users/$uid/entries/$entryId';
   static String entriesPath(String uid) => 'users/$uid/entries';
 
   // create
@@ -49,12 +48,10 @@ class EntriesRepository {
           .map((snapshot) => snapshot.docs.map((doc) => doc.data()).toList());
 
   Query<Entry> queryEntries({required UserID uid, JobID? jobId}) {
-    Query<Entry> query =
-        _firestore.collection(entriesPath(uid)).withConverter<Entry>(
-              fromFirestore: (snapshot, _) =>
-                  Entry.fromMap(snapshot.data()!, snapshot.id),
-              toFirestore: (entry, _) => entry.toMap(),
-            );
+    Query<Entry> query = _firestore.collection(entriesPath(uid)).withConverter<Entry>(
+          fromFirestore: (snapshot, _) => Entry.fromMap(snapshot.data()!, snapshot.id),
+          toFirestore: (entry, _) => entry.toMap(),
+        );
     if (jobId != null) {
       query = query.where('jobId', isEqualTo: jobId);
     }
