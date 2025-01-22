@@ -1,6 +1,6 @@
-# Time Tracking app with Flutter & Firebase
+# Illemo
 
-A time tracking application built with Flutter & Firebase: 
+An emotion journaling app.
 
 ![](/.github/images/time-tracker-screenshots.png)
 
@@ -8,11 +8,11 @@ This is intended as a **reference app** based on my [Riverpod Architecture](http
 
 > **Note**: this project used to be called "Started Architecture for Flutter & Firebase" (based on this [old article](https://codewithandrea.com/videos/starter-architecture-flutter-firebase/)). As of January 2023, it follows my updated [Riverpod Architecture](https://codewithandrea.com/articles/flutter-app-architecture-riverpod-introduction/), using the latest packages.
 
-## Flutter web preview
+<!-- ## Flutter web preview
 
 A Flutter web preview of the app is available here:
 
-- [Time Tracker | Flutter web demo](https://starter-architecture-flutter.web.app)
+- [Time Tracker | Flutter web demo](https://starter-architecture-flutter.web.app) -->
 
 ## Features
 
