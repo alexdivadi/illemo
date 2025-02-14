@@ -32,6 +32,7 @@ class MyApp extends ConsumerWidget {
               // * Example ID from this app: https://fluttertips.dev/
               // * To avoid mistakes, store the ID as an environment variable and
               // * read it with String.fromEnvironment
+              // TODO: update isoAppStoreId
               iosAppStoreId: '6482293361',
             ),
             allowCancel: false,
