@@ -10,13 +10,11 @@ String _$entriesRepositoryHash() => r'17cd56c685d800f8456e9f526108ae479eb0aec2';
 
 /// See also [entriesRepository].
 @ProviderFor(entriesRepository)
-final entriesRepositoryProvider =
-    AutoDisposeProvider<EntriesRepository>.internal(
+final entriesRepositoryProvider = AutoDisposeProvider<EntriesRepository>.internal(
   entriesRepository,
   name: r'entriesRepositoryProvider',
-  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-      ? null
-      : _$entriesRepositoryHash,
+  debugGetCreateSourceHash:
+      const bool.fromEnvironment('dart.vm.product') ? null : _$entriesRepositoryHash,
   dependencies: null,
   allTransitiveDependencies: null,
 );
@@ -82,8 +80,7 @@ class JobEntriesQueryFamily extends Family<Query<Entry>> {
   static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
 
   @override
-  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
-      _allTransitiveDependencies;
+  Iterable<ProviderOrFamily>? get allTransitiveDependencies => _allTransitiveDependencies;
 
   @override
   String? get name => r'jobEntriesQueryProvider';
@@ -102,12 +99,9 @@ class JobEntriesQueryProvider extends AutoDisposeProvider<Query<Entry>> {
           from: jobEntriesQueryProvider,
           name: r'jobEntriesQueryProvider',
           debugGetCreateSourceHash:
-              const bool.fromEnvironment('dart.vm.product')
-                  ? null
-                  : _$jobEntriesQueryHash,
+              const bool.fromEnvironment('dart.vm.product') ? null : _$jobEntriesQueryHash,
           dependencies: JobEntriesQueryFamily._dependencies,
-          allTransitiveDependencies:
-              JobEntriesQueryFamily._allTransitiveDependencies,
+          allTransitiveDependencies: JobEntriesQueryFamily._allTransitiveDependencies,
           jobId: jobId,
         );
 
@@ -167,8 +161,8 @@ mixin JobEntriesQueryRef on AutoDisposeProviderRef<Query<Entry>> {
   String get jobId;
 }
 
-class _JobEntriesQueryProviderElement
-    extends AutoDisposeProviderElement<Query<Entry>> with JobEntriesQueryRef {
+class _JobEntriesQueryProviderElement extends AutoDisposeProviderElement<Query<Entry>>
+    with JobEntriesQueryRef {
   _JobEntriesQueryProviderElement(super.provider);
 
   @override

@@ -18,16 +18,16 @@ class EmotionLogModel {
 
   final EmotionLogID id;
 
-  /// Only first emotion is required. Stored in db as id (int).
+  /// Only first emotion is required. Stored in db as id (an [int]).
   final int emotion1;
   final int? emotion2;
   final int? emotion3;
 
   /// Used for date only, not time.
-  /// Format is yyyy-MM-dd
+  /// Format is `yyyy-MM-dd`.
   final String date;
 
-  /// Used to track when the log was updated. Stored in db as milliseconds since epoch (int).
+  /// Used to track when the log was updated. Stored in db as milliseconds since epoch (an [int]).
   final int timestamp;
 
   factory EmotionLogModel.fromEntity(EmotionLog entity, {EmotionLogID? id, int? timestamp}) {

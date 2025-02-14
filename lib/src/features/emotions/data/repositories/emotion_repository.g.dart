@@ -13,13 +13,11 @@ String _$emotionRepositoryHash() => r'13ae68e9d0d5907bd2a4b578cb4ff5990be29f78';
 ///
 /// Copied from [EmotionRepository].
 @ProviderFor(EmotionRepository)
-final emotionRepositoryProvider =
-    AsyncNotifierProvider<EmotionRepository, EmotionLog?>.internal(
+final emotionRepositoryProvider = AsyncNotifierProvider<EmotionRepository, EmotionLog?>.internal(
   EmotionRepository.new,
   name: r'emotionRepositoryProvider',
-  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-      ? null
-      : _$emotionRepositoryHash,
+  debugGetCreateSourceHash:
+      const bool.fromEnvironment('dart.vm.product') ? null : _$emotionRepositoryHash,
   dependencies: null,
   allTransitiveDependencies: null,
 );

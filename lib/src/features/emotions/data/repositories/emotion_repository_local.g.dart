@@ -6,8 +6,7 @@ part of 'emotion_repository_local.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$emotionRepositoryLocalHash() =>
-    r'685a805fb855d044572d0d97ad9dfa374c88c82b';
+String _$emotionRepositoryLocalHash() => r'685a805fb855d044572d0d97ad9dfa374c88c82b';
 
 /// Local implementation of [EmotionRepository].
 /// Depends on [sharedPreferencesProvider] for storing data.
@@ -18,9 +17,8 @@ final emotionRepositoryLocalProvider =
     AsyncNotifierProvider<EmotionRepositoryLocal, EmotionLog?>.internal(
   EmotionRepositoryLocal.new,
   name: r'emotionRepositoryLocalProvider',
-  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-      ? null
-      : _$emotionRepositoryLocalHash,
+  debugGetCreateSourceHash:
+      const bool.fromEnvironment('dart.vm.product') ? null : _$emotionRepositoryLocalHash,
   dependencies: null,
   allTransitiveDependencies: null,
 );

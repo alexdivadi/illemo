@@ -13,9 +13,8 @@ String _$jobsRepositoryHash() => r'38b37bbcb0ced4ca0754f549ebbe9384bc2bda31';
 final jobsRepositoryProvider = Provider<JobsRepository>.internal(
   jobsRepository,
   name: r'jobsRepositoryProvider',
-  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-      ? null
-      : _$jobsRepositoryHash,
+  debugGetCreateSourceHash:
+      const bool.fromEnvironment('dart.vm.product') ? null : _$jobsRepositoryHash,
   dependencies: null,
   allTransitiveDependencies: null,
 );
@@ -30,8 +29,7 @@ String _$jobsQueryHash() => r'aeaccb50f75b9e5bc97b07443935ffd432dba51a';
 final jobsQueryProvider = AutoDisposeProvider<Query<Job>>.internal(
   jobsQuery,
   name: r'jobsQueryProvider',
-  debugGetCreateSourceHash:
-      const bool.fromEnvironment('dart.vm.product') ? null : _$jobsQueryHash,
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product') ? null : _$jobsQueryHash,
   dependencies: null,
   allTransitiveDependencies: null,
 );
@@ -97,8 +95,7 @@ class JobStreamFamily extends Family<AsyncValue<Job>> {
   static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
 
   @override
-  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
-      _allTransitiveDependencies;
+  Iterable<ProviderOrFamily>? get allTransitiveDependencies => _allTransitiveDependencies;
 
   @override
   String? get name => r'jobStreamProvider';
@@ -117,9 +114,7 @@ class JobStreamProvider extends AutoDisposeStreamProvider<Job> {
           from: jobStreamProvider,
           name: r'jobStreamProvider',
           debugGetCreateSourceHash:
-              const bool.fromEnvironment('dart.vm.product')
-                  ? null
-                  : _$jobStreamHash,
+              const bool.fromEnvironment('dart.vm.product') ? null : _$jobStreamHash,
           dependencies: JobStreamFamily._dependencies,
           allTransitiveDependencies: JobStreamFamily._allTransitiveDependencies,
           jobId: jobId,
@@ -181,8 +176,7 @@ mixin JobStreamRef on AutoDisposeStreamProviderRef<Job> {
   String get jobId;
 }
 
-class _JobStreamProviderElement extends AutoDisposeStreamProviderElement<Job>
-    with JobStreamRef {
+class _JobStreamProviderElement extends AutoDisposeStreamProviderElement<Job> with JobStreamRef {
   _JobStreamProviderElement(super.provider);
 
   @override

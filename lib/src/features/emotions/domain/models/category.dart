@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:illemo/src/utils/capitalize.dart';
 
 enum Category implements Comparable<Category> {
   sad(1, baseColor: Colors.blue),
@@ -25,7 +26,15 @@ enum Category implements Comparable<Category> {
     for (var category in Category.values) category.id: category
   };
 
+  /// Returns the [Category] associated with the given [id].
+  ///
+  /// Throws an [ArgumentError] if no category with the given [id] is found.
   static Category get(int id) {
     return _categoryById[id] ?? (throw ArgumentError('Emotion with id $id not found'));
+  }
+
+  @override
+  String toString() {
+    return name.capitalize();
   }
 }

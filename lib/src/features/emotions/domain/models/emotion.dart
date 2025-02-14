@@ -99,6 +99,9 @@ enum Emotion {
     for (var emotion in Emotion.values) emotion.id: emotion
   };
 
+  /// Returns the [Emotion] associated with the given [id].
+  ///
+  /// Throws an [ArgumentError] if no emotion with the given [id] is found.
   static Emotion get(int id) {
     return _emotionById[id] ?? (throw ArgumentError('Emotion with id $id not found'));
   }
