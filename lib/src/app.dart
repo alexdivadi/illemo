@@ -55,7 +55,7 @@ class MyApp extends ConsumerWidget {
               }
             },
             onException: (e, st) {
-              log(e.toString());
+              log(e.toString(), error: e, stackTrace: st);
             },
             child: child!,
           ),

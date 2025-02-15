@@ -5,9 +5,16 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "Run",
+      "name": "dev",
       "request": "launch",
-      "type": "dart"
+      "type": "dart",
+      "args": ["--flavor", "dev"]
+    },
+    {
+      "name": "prod",
+      "request": "launch",
+      "type": "dart",
+      "args": ["--flavor", "prod"]
     },
     {
       "name": "Run (profile mode)",

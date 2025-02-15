@@ -47,4 +47,10 @@ dev_dependencies:
 flutter:
   uses-material-design: true
   assets:
-    - assets/time-tracking.svg
+    - assets/common/
+    - path: assets/dev/
+      flavors:
+        - dev
+    - path: assets/prod/
+      flavors:
+        - production
