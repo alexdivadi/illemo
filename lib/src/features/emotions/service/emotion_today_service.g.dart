@@ -1,27 +1,27 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'job_entries_list_controller.dart';
+part of 'emotion_today_service.dart';
 
 // **************************************************************************
 // RiverpodGenerator
 // **************************************************************************
 
-String _$jobsEntriesListControllerHash() =>
-    r'f9a08b66a0c962d210a09aebb711d38acb354b1e';
+String _$emotionTodayServiceHash() =>
+    r'fd16fdca855ecca2dc1760da8288eadb7fd4a59d';
 
-/// See also [JobsEntriesListController].
-@ProviderFor(JobsEntriesListController)
-final jobsEntriesListControllerProvider =
-    AutoDisposeAsyncNotifierProvider<JobsEntriesListController, void>.internal(
-  JobsEntriesListController.new,
-  name: r'jobsEntriesListControllerProvider',
+/// See also [EmotionTodayService].
+@ProviderFor(EmotionTodayService)
+final emotionTodayServiceProvider =
+    AutoDisposeAsyncNotifierProvider<EmotionTodayService, EmotionLog?>.internal(
+  EmotionTodayService.new,
+  name: r'emotionTodayServiceProvider',
   debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
       ? null
-      : _$jobsEntriesListControllerHash,
+      : _$emotionTodayServiceHash,
   dependencies: null,
   allTransitiveDependencies: null,
 );
 
-typedef _$JobsEntriesListController = AutoDisposeAsyncNotifier<void>;
+typedef _$EmotionTodayService = AutoDisposeAsyncNotifier<EmotionLog?>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

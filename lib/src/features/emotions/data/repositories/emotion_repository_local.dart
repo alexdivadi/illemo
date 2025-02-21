@@ -1,33 +1,28 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:illemo/src/features/authentication/domain/app_user.dart';
 import 'package:illemo/src/features/emotions/data/repositories/emotion_repository.dart';
 import 'package:illemo/src/features/emotions/domain/entities/emotion_log.dart';
 import 'package:illemo/src/features/emotions/domain/models/emotion_log_model.dart';
 import 'package:illemo/src/utils/shared_preferences_provider.dart';
-import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
-part 'emotion_repository_local.g.dart';
 
 /// Local implementation of [EmotionRepository].
 /// Depends on [sharedPreferencesProvider] for storing data.
-@Riverpod(keepAlive: true)
-class EmotionRepositoryLocal extends _$EmotionRepositoryLocal implements EmotionRepository {
-  EmotionRepositoryLocal();
+class EmotionRepositoryLocal implements EmotionRepository {
+  const EmotionRepositoryLocal({
+    required this.userID,
+    required this.prefs,
+  });
 
   /// The path used for storing emotion logs in shared preferences.
   final String _collectionPath = 'emotions';
 
   /// The shared preferences instance with cache.
-  late final SharedPreferencesWithCache _prefs;
-
-  /// Initializes the repository and retrieves today's emotion log if available.
+  final SharedPreferencesWithCache prefs;
   @override
-  Future<EmotionLog?> build() async {
-    _prefs = ref.watch(sharedPreferencesProvider).requireValue;
-    return getEmotionLogToday();
-  }
+  final UserID userID;
 
   /// Adds a new emotion log to the local storage.
   ///
@@ -35,7 +30,7 @@ class EmotionRepositoryLocal extends _$EmotionRepositoryLocal implements Emotion
   @override
   Future<void> addEmotionLog(EmotionLog emotionLog) async {
     final key = '${_collectionPath}_${emotionLog.date.weekday}';
-    await _prefs.setString(key, jsonEncode(EmotionLogModel.fromEntity(emotionLog).toMap()));
+    await prefs.setString(key, jsonEncode(EmotionLogModel.fromEntity(emotionLog).toMap()));
   }
 
   /// Updates an existing emotion log in the local storage.
@@ -46,7 +41,7 @@ class EmotionRepositoryLocal extends _$EmotionRepositoryLocal implements Emotion
   Future<void> updateEmotionLog(String id, EmotionLog emotionLog) async {
     /// id is the weekday (only stores up to 7 entries)
     final key = '${_collectionPath}_${emotionLog.date.weekday}';
-    await _prefs.setString(key, jsonEncode(EmotionLogModel.fromEntity(emotionLog, id: id).toMap()));
+    await prefs.setString(key, jsonEncode(EmotionLogModel.fromEntity(emotionLog, id: id).toMap()));
   }
 
   /// Deletes an emotion log from the local storage.
@@ -55,7 +50,7 @@ class EmotionRepositoryLocal extends _$EmotionRepositoryLocal implements Emotion
   @override
   Future<void> deleteEmotionLog(String id) async {
     final key = '${_collectionPath}_$id';
-    await _prefs.remove(key);
+    await prefs.remove(key);
   }
 
   /// Retrieves an emotion log by its identifier from the local storage.
@@ -65,7 +60,7 @@ class EmotionRepositoryLocal extends _$EmotionRepositoryLocal implements Emotion
   @override
   Future<EmotionLog?> getEmotionLog(String id) async {
     final key = '${_collectionPath}_$id';
-    final jsonString = _prefs.getString(key);
+    final jsonString = prefs.getString(key);
     if (jsonString != null) {
       return EmotionLogModel.fromMap(jsonDecode(jsonString)).toEntity();
     }
@@ -78,7 +73,7 @@ class EmotionRepositoryLocal extends _$EmotionRepositoryLocal implements Emotion
   @override
   Future<EmotionLog?> getEmotionLogToday() async {
     final key = '${_collectionPath}_${DateTime.now().weekday}';
-    final jsonString = _prefs.getString(key);
+    final jsonString = prefs.getString(key);
     if (jsonString != null) {
       final EmotionLog emotionLog = EmotionLogModel.fromMap(jsonDecode(jsonString)).toEntity();
       if (DateUtils.isSameDay(emotionLog.date, DateTime.now())) {
@@ -98,10 +93,10 @@ class EmotionRepositoryLocal extends _$EmotionRepositoryLocal implements Emotion
     DateTime? startDate,
     DateTime? endDate,
   }) async* {
-    final keys = _prefs.keys.where((key) => key.startsWith(_collectionPath));
+    final keys = prefs.keys.where((key) => key.startsWith(_collectionPath));
     final logs = <EmotionLog>[];
     for (final key in keys) {
-      final jsonString = _prefs.getString(key);
+      final jsonString = prefs.getString(key);
       if (jsonString != null) {
         final emotionLog = EmotionLogModel.fromMap(jsonDecode(jsonString)).toEntity();
         if ((startDate == null || emotionLog.date.isAfter(startDate)) &&

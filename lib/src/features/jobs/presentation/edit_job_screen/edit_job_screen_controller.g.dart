@@ -6,7 +6,8 @@ part of 'edit_job_screen_controller.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$editJobScreenControllerHash() => r'e2985913f443860f6aa9d1b0aa462d4e5c25bed4';
+String _$editJobScreenControllerHash() =>
+    r'e2985913f443860f6aa9d1b0aa462d4e5c25bed4';
 
 /// See also [EditJobScreenController].
 @ProviderFor(EditJobScreenController)
@@ -14,8 +15,9 @@ final editJobScreenControllerProvider =
     AutoDisposeAsyncNotifierProvider<EditJobScreenController, void>.internal(
   EditJobScreenController.new,
   name: r'editJobScreenControllerProvider',
-  debugGetCreateSourceHash:
-      const bool.fromEnvironment('dart.vm.product') ? null : _$editJobScreenControllerHash,
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$editJobScreenControllerHash,
   dependencies: null,
   allTransitiveDependencies: null,
 );

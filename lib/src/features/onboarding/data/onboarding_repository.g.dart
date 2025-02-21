@@ -6,15 +6,18 @@ part of 'onboarding_repository.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$onboardingRepositoryHash() => r'445c529dd1ac7515d8be0abd6159af6958ff3c5c';
+String _$onboardingRepositoryHash() =>
+    r'445c529dd1ac7515d8be0abd6159af6958ff3c5c';
 
 /// See also [onboardingRepository].
 @ProviderFor(onboardingRepository)
-final onboardingRepositoryProvider = FutureProvider<OnboardingRepository>.internal(
+final onboardingRepositoryProvider =
+    FutureProvider<OnboardingRepository>.internal(
   onboardingRepository,
   name: r'onboardingRepositoryProvider',
-  debugGetCreateSourceHash:
-      const bool.fromEnvironment('dart.vm.product') ? null : _$onboardingRepositoryHash,
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$onboardingRepositoryHash,
   dependencies: null,
   allTransitiveDependencies: null,
 );

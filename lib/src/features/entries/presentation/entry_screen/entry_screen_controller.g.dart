@@ -6,7 +6,8 @@ part of 'entry_screen_controller.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$entryScreenControllerHash() => r'75638e7eac6bacd498349a143fc5fc827171674a';
+String _$entryScreenControllerHash() =>
+    r'75638e7eac6bacd498349a143fc5fc827171674a';
 
 /// See also [EntryScreenController].
 @ProviderFor(EntryScreenController)
@@ -14,8 +15,9 @@ final entryScreenControllerProvider =
     AutoDisposeAsyncNotifierProvider<EntryScreenController, void>.internal(
   EntryScreenController.new,
   name: r'entryScreenControllerProvider',
-  debugGetCreateSourceHash:
-      const bool.fromEnvironment('dart.vm.product') ? null : _$entryScreenControllerHash,
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$entryScreenControllerHash,
   dependencies: null,
   allTransitiveDependencies: null,
 );
