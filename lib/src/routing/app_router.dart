@@ -3,7 +3,8 @@ import 'package:go_router/go_router.dart';
 import 'package:illemo/src/features/authentication/data/firebase_auth_repository.dart';
 import 'package:illemo/src/features/authentication/presentation/custom_profile_screen.dart';
 import 'package:illemo/src/features/authentication/presentation/custom_sign_in_screen.dart';
-import 'package:illemo/src/features/emotions/presentation/emotion_picker.dart';
+import 'package:illemo/src/features/emotions/presentation/screens/dashboard.dart';
+import 'package:illemo/src/features/emotions/presentation/screens/emotion_picker.dart';
 import 'package:illemo/src/features/entries/domain/entry.dart';
 import 'package:illemo/src/features/entries/presentation/entries_screen.dart';
 import 'package:illemo/src/features/entries/presentation/entry_screen/entry_screen.dart';
@@ -40,6 +41,7 @@ enum AppRoute {
   entries,
   profile,
   emotionPicker,
+  dashboard,
 }
 
 @riverpod
@@ -64,12 +66,13 @@ GoRouter goRouter(Ref ref) {
       final isLoggedIn = authRepository.currentUser != null;
       if (isLoggedIn) {
         if (path.startsWith('/onboarding') || path.startsWith('/signIn')) {
-          return EmotionPickerScreen.path;
+          return DashboardScreen.path;
         }
       } else {
         if (path.startsWith('/onboarding') ||
             path.startsWith('/jobs') ||
             path.startsWith(EmotionPickerScreen.path) ||
+            path.startsWith(DashboardScreen.path) ||
             path.startsWith('/entries') ||
             path.startsWith('/account')) {
           return '/signIn';
@@ -93,6 +96,14 @@ GoRouter goRouter(Ref ref) {
           child: CustomSignInScreen(),
         ),
       ),
+      GoRoute(
+          path: EmotionPickerScreen.path,
+          name: AppRoute.emotionPicker.name,
+          pageBuilder: (context, state) {
+            return const NoTransitionPage(
+              child: EmotionPickerScreen(),
+            );
+          }),
       // Stateful navigation based on:
       // https://github.com/flutter/packages/blob/main/packages/go_router/example/lib/stateful_shell_route.dart
       StatefulShellRoute.indexedStack(
@@ -104,11 +115,11 @@ GoRouter goRouter(Ref ref) {
             navigatorKey: _jobsNavigatorKey,
             routes: [
               GoRoute(
-                  path: EmotionPickerScreen.path,
-                  name: AppRoute.emotionPicker.name,
+                  path: DashboardScreen.path,
+                  name: AppRoute.dashboard.name,
                   pageBuilder: (context, state) {
                     return const NoTransitionPage(
-                      child: EmotionPickerScreen(),
+                      child: DashboardScreen(),
                     );
                   }),
               GoRoute(

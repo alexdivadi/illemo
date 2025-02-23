@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:illemo/src/features/emotions/data/repositories/emotion_repository.dart';
 import 'package:illemo/src/features/emotions/domain/entities/emotion_log.dart';
 import 'package:illemo/src/features/emotions/domain/models/emotion_log_model.dart';
@@ -21,11 +23,13 @@ class EmotionTodayService extends _$EmotionTodayService {
     } else {
       await _emotionRepository.updateEmotionLog(id, emotionLog);
     }
+    log('Updated today\'s emotions: $emotionLog');
     state = AsyncValue<EmotionLog?>.data(emotionLog);
   }
 
   void deleteEmotionLogToday(EmotionLogID id) async {
     await _emotionRepository.deleteEmotionLog(id);
+    log('Deleted today\'s emotions.');
     state = AsyncValue.data(null);
   }
 }

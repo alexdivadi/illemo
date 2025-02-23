@@ -7,7 +7,7 @@ part of 'emotion_today_service.dart';
 // **************************************************************************
 
 String _$emotionTodayServiceHash() =>
-    r'fd16fdca855ecca2dc1760da8288eadb7fd4a59d';
+    r'8f552f1921c9467adecb0bf35b1c908361d71673';
 
 /// See also [EmotionTodayService].
 @ProviderFor(EmotionTodayService)
