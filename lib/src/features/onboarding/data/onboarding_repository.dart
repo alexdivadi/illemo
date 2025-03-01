@@ -7,7 +7,7 @@ part 'onboarding_repository.g.dart';
 
 class OnboardingRepository {
   OnboardingRepository(this.sharedPreferences);
-  final SharedPreferences sharedPreferences;
+  final SharedPreferencesWithCache sharedPreferences;
 
   static const onboardingCompleteKey = 'onboardingComplete';
 

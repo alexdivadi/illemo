@@ -1,22 +1,26 @@
 import 'package:flutter/material.dart';
-import 'package:riverpod/riverpod.dart';
-import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:go_router/go_router.dart';
 import 'package:illemo/src/features/authentication/data/firebase_auth_repository.dart';
 import 'package:illemo/src/features/authentication/presentation/custom_profile_screen.dart';
 import 'package:illemo/src/features/authentication/presentation/custom_sign_in_screen.dart';
-import 'package:illemo/src/features/entries/presentation/entries_screen.dart';
+import 'package:illemo/src/features/emotions/domain/entities/emotion_log.dart';
+import 'package:illemo/src/features/emotions/presentation/screens/dashboard.dart';
+import 'package:illemo/src/features/emotions/presentation/screens/emotion_picker.dart';
+import 'package:illemo/src/features/emotions/presentation/screens/emotion_upload.dart';
 import 'package:illemo/src/features/entries/domain/entry.dart';
-import 'package:illemo/src/features/jobs/domain/job.dart';
+import 'package:illemo/src/features/entries/presentation/entries_screen.dart';
 import 'package:illemo/src/features/entries/presentation/entry_screen/entry_screen.dart';
-import 'package:illemo/src/features/jobs/presentation/job_entries_screen/job_entries_screen.dart';
-import 'package:go_router/go_router.dart';
+import 'package:illemo/src/features/jobs/domain/job.dart';
 import 'package:illemo/src/features/jobs/presentation/edit_job_screen/edit_job_screen.dart';
+import 'package:illemo/src/features/jobs/presentation/job_entries_screen/job_entries_screen.dart';
 import 'package:illemo/src/features/jobs/presentation/jobs_screen/jobs_screen.dart';
 import 'package:illemo/src/features/onboarding/data/onboarding_repository.dart';
 import 'package:illemo/src/features/onboarding/presentation/onboarding_screen.dart';
 import 'package:illemo/src/routing/go_router_refresh_stream.dart';
 import 'package:illemo/src/routing/not_found_screen.dart';
 import 'package:illemo/src/routing/scaffold_with_nested_navigation.dart';
+import 'package:riverpod/riverpod.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'app_router.g.dart';
 
@@ -38,6 +42,9 @@ enum AppRoute {
   editEntry,
   entries,
   profile,
+  emotionPicker,
+  emotionUpload,
+  dashboard,
 }
 
 @riverpod
@@ -62,11 +69,13 @@ GoRouter goRouter(Ref ref) {
       final isLoggedIn = authRepository.currentUser != null;
       if (isLoggedIn) {
         if (path.startsWith('/onboarding') || path.startsWith('/signIn')) {
-          return '/jobs';
+          return DashboardScreen.path;
         }
       } else {
         if (path.startsWith('/onboarding') ||
             path.startsWith('/jobs') ||
+            path.startsWith(EmotionPickerScreen.path) ||
+            path.startsWith(DashboardScreen.path) ||
             path.startsWith('/entries') ||
             path.startsWith('/account')) {
           return '/signIn';
@@ -90,6 +99,25 @@ GoRouter goRouter(Ref ref) {
           child: CustomSignInScreen(),
         ),
       ),
+      GoRoute(
+          path: EmotionPickerScreen.path,
+          name: AppRoute.emotionPicker.name,
+          builder: (context, state) {
+            final todaysEmotionLog = state.extra as EmotionLog?;
+            return EmotionPickerScreen(
+              todaysEmotionLog: todaysEmotionLog,
+            );
+          }),
+      GoRoute(
+        path: EmotionUpload.path,
+        name: AppRoute.emotionUpload.name,
+        builder: (context, state) {
+          final args = state.extra as Map<String, dynamic>;
+          return EmotionUpload(
+            args: args,
+          );
+        },
+      ),
       // Stateful navigation based on:
       // https://github.com/flutter/packages/blob/main/packages/go_router/example/lib/stateful_shell_route.dart
       StatefulShellRoute.indexedStack(
@@ -100,6 +128,13 @@ GoRouter goRouter(Ref ref) {
           StatefulShellBranch(
             navigatorKey: _jobsNavigatorKey,
             routes: [
+              GoRoute(
+                path: DashboardScreen.path,
+                name: AppRoute.dashboard.name,
+                pageBuilder: (context, state) => const NoTransitionPage(
+                  child: DashboardScreen(),
+                ),
+              ),
               GoRoute(
                 path: '/jobs',
                 name: AppRoute.jobs.name,

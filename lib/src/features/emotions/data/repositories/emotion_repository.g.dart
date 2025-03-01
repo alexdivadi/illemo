@@ -1,28 +1,31 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'shared_preferences_provider.dart';
+part of 'emotion_repository.dart';
 
 // **************************************************************************
 // RiverpodGenerator
 // **************************************************************************
 
-String _$sharedPreferencesHash() => r'8ad0f57d954e8c413084bfe5492c81b218c3e4a0';
+String _$emotionRepositoryHash() => r'4c707ff8ed33361c7bea9e1b837b1fbdbf10071e';
 
-/// See also [sharedPreferences].
-@ProviderFor(sharedPreferences)
-final sharedPreferencesProvider =
-    FutureProvider<SharedPreferencesWithCache>.internal(
-  sharedPreferences,
-  name: r'sharedPreferencesProvider',
+/// Provider for [EmotionRepository].
+/// Requires [UserID] userID.
+///
+/// Copied from [emotionRepository].
+@ProviderFor(emotionRepository)
+final emotionRepositoryProvider =
+    AutoDisposeProvider<EmotionRepository>.internal(
+  emotionRepository,
+  name: r'emotionRepositoryProvider',
   debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
       ? null
-      : _$sharedPreferencesHash,
+      : _$emotionRepositoryHash,
   dependencies: null,
   allTransitiveDependencies: null,
 );
 
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
-typedef SharedPreferencesRef = FutureProviderRef<SharedPreferencesWithCache>;
+typedef EmotionRepositoryRef = AutoDisposeProviderRef<EmotionRepository>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

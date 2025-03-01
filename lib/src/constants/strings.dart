@@ -5,8 +5,7 @@ class Strings {
 
   // Logout
   static const String logout = 'Logout';
-  static const String logoutAreYouSure =
-      'Are you sure that you want to logout?';
+  static const String logoutAreYouSure = 'Are you sure that you want to logout?';
   static const String logoutFailed = 'Logout failed';
 
   // Sign In Page
