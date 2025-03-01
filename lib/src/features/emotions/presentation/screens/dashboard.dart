@@ -21,7 +21,8 @@ class DashboardScreen extends ConsumerWidget {
         child: todaysEmotionLog.isLoading
             ? const CircularProgressIndicator.adaptive()
             : ElevatedButton(
-                onPressed: () => context.push(EmotionPickerScreen.path),
+                onPressed: () =>
+                    context.push(EmotionPickerScreen.path, extra: todaysEmotionLog.value),
                 child: todaysEmotionLog.value != null
                     ? Text('You are feeling ${todaysEmotionLog.value!.emotion1} today.')
                     : Text('Log your emotions!')),

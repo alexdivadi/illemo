@@ -6,7 +6,7 @@ part of 'emotion_repository.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$emotionRepositoryHash() => r'b227856391c76764a5ab645787075557b65cb5db';
+String _$emotionRepositoryHash() => r'4c707ff8ed33361c7bea9e1b837b1fbdbf10071e';
 
 /// Provider for [EmotionRepository].
 /// Requires [UserID] userID.

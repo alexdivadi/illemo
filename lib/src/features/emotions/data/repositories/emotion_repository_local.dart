@@ -28,9 +28,11 @@ class EmotionRepositoryLocal implements EmotionRepository {
   ///
   /// [emotionLog] - The emotion log to be added.
   @override
-  Future<void> addEmotionLog(EmotionLog emotionLog) async {
+  Future<EmotionLogID> addEmotionLog(EmotionLog emotionLog) async {
     final key = '${_collectionPath}_${emotionLog.date.weekday}';
-    await prefs.setString(key, jsonEncode(EmotionLogModel.fromEntity(emotionLog).toMap()));
+    final EmotionLogModel emotionLogModel = EmotionLogModel.fromEntity(emotionLog);
+    await prefs.setString(key, jsonEncode(emotionLogModel.toMap()));
+    return emotionLogModel.id;
   }
 
   /// Updates an existing emotion log in the local storage.

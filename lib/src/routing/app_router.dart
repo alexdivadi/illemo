@@ -3,8 +3,10 @@ import 'package:go_router/go_router.dart';
 import 'package:illemo/src/features/authentication/data/firebase_auth_repository.dart';
 import 'package:illemo/src/features/authentication/presentation/custom_profile_screen.dart';
 import 'package:illemo/src/features/authentication/presentation/custom_sign_in_screen.dart';
+import 'package:illemo/src/features/emotions/domain/entities/emotion_log.dart';
 import 'package:illemo/src/features/emotions/presentation/screens/dashboard.dart';
 import 'package:illemo/src/features/emotions/presentation/screens/emotion_picker.dart';
+import 'package:illemo/src/features/emotions/presentation/screens/emotion_upload.dart';
 import 'package:illemo/src/features/entries/domain/entry.dart';
 import 'package:illemo/src/features/entries/presentation/entries_screen.dart';
 import 'package:illemo/src/features/entries/presentation/entry_screen/entry_screen.dart';
@@ -41,6 +43,7 @@ enum AppRoute {
   entries,
   profile,
   emotionPicker,
+  emotionUpload,
   dashboard,
 }
 
@@ -99,11 +102,22 @@ GoRouter goRouter(Ref ref) {
       GoRoute(
           path: EmotionPickerScreen.path,
           name: AppRoute.emotionPicker.name,
-          pageBuilder: (context, state) {
-            return const NoTransitionPage(
-              child: EmotionPickerScreen(),
+          builder: (context, state) {
+            final todaysEmotionLog = state.extra as EmotionLog?;
+            return EmotionPickerScreen(
+              todaysEmotionLog: todaysEmotionLog,
             );
           }),
+      GoRoute(
+        path: EmotionUpload.path,
+        name: AppRoute.emotionUpload.name,
+        builder: (context, state) {
+          final args = state.extra as Map<String, dynamic>;
+          return EmotionUpload(
+            args: args,
+          );
+        },
+      ),
       // Stateful navigation based on:
       // https://github.com/flutter/packages/blob/main/packages/go_router/example/lib/stateful_shell_route.dart
       StatefulShellRoute.indexedStack(
@@ -115,13 +129,12 @@ GoRouter goRouter(Ref ref) {
             navigatorKey: _jobsNavigatorKey,
             routes: [
               GoRoute(
-                  path: DashboardScreen.path,
-                  name: AppRoute.dashboard.name,
-                  pageBuilder: (context, state) {
-                    return const NoTransitionPage(
-                      child: DashboardScreen(),
-                    );
-                  }),
+                path: DashboardScreen.path,
+                name: AppRoute.dashboard.name,
+                pageBuilder: (context, state) => const NoTransitionPage(
+                  child: DashboardScreen(),
+                ),
+              ),
               GoRoute(
                 path: '/jobs',
                 name: AppRoute.jobs.name,

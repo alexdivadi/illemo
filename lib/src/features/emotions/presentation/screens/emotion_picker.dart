@@ -2,11 +2,12 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:illemo/src/common_widgets/looping_listview.dart';
 import 'package:illemo/src/features/emotions/domain/entities/emotion_log.dart';
 import 'package:illemo/src/features/emotions/domain/models/category.dart';
 import 'package:illemo/src/features/emotions/domain/models/emotion.dart';
-import 'package:illemo/src/features/emotions/service/emotion_today_service.dart';
+import 'package:illemo/src/features/emotions/presentation/screens/emotion_upload.dart';
 
 class EmotionPickerScreen extends ConsumerStatefulWidget {
   const EmotionPickerScreen({super.key, this.todaysEmotionLog});
@@ -45,51 +46,134 @@ class _EmotionPickerScreenState extends ConsumerState<EmotionPickerScreen> {
     }
   }
 
+  void pushEmotion(Emotion emotion) {
+    if (_selectedEmotions.length < 3) {
+      setState(() {
+        _selectedEmotions.add(emotion);
+        currentEmotion = null;
+      });
+    }
+  }
+
+  void _removeEmotion(int index) {
+    setState(() {
+      currentEmotion = _selectedEmotions.removeAt(index);
+    });
+  }
+
+  void _submitEmotions() {
+    context.go(EmotionUpload.path, extra: {
+      'emotionIDs': _selectedEmotions.map((e) => e.id).toList(),
+      'id': widget.todaysEmotionLog?.id,
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.black,
-      appBar: AppBar(
-        title: const Text(EmotionPickerScreen.title),
-      ),
-      body: Stack(children: [
-        _buildEmotionWheels(),
-        Positioned(
-          top: 0,
-          left: 0,
-          right: 0,
-          child: IgnorePointer(
-            child: Container(
-              height: 200,
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: [Colors.black.withValues(alpha: 0.85), Colors.transparent],
+        backgroundColor: Colors.black,
+        appBar: AppBar(
+          title: const Text(EmotionPickerScreen.title),
+        ),
+        body: Stack(children: [
+          _buildEmotionWheels(),
+          Positioned(
+            top: 0,
+            left: 0,
+            right: 0,
+            child: IgnorePointer(
+              child: Container(
+                height: 200,
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [Colors.black.withValues(alpha: 0.85), Colors.transparent],
+                  ),
                 ),
               ),
             ),
           ),
-        ),
-        Positioned(
-          bottom: 0,
-          left: 0,
-          right: 0,
-          child: IgnorePointer(
-            child: Container(
-              height: 200,
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.bottomCenter,
-                  end: Alignment.topCenter,
-                  colors: [Colors.black.withValues(alpha: 0.85), Colors.transparent],
+          Positioned(
+            bottom: 0,
+            left: 0,
+            right: 0,
+            child: IgnorePointer(
+              child: Container(
+                height: 200,
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.bottomCenter,
+                    end: Alignment.topCenter,
+                    colors: [Colors.black.withValues(alpha: 0.85), Colors.transparent],
+                  ),
                 ),
               ),
             ),
           ),
-        ),
-      ]),
-    );
+          if (_selectedEmotions.length >= 3)
+            Positioned(
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              child: Center(
+                child: Container(
+                  color: Colors.black.withValues(alpha: (0.5)),
+                ),
+              ),
+            ),
+          if (_selectedEmotions.length >= 3)
+            Center(
+              child: ElevatedButton(
+                onPressed: _submitEmotions,
+                child: const Text('Submit'),
+              ),
+            ),
+          Positioned(
+            top: 16,
+            left: 16,
+            child: Row(
+              children: [
+                for (int index = 0; index < _selectedEmotions.length; index++)
+                  Padding(
+                    padding: const EdgeInsets.only(right: 8),
+                    child: Container(
+                      width: 50,
+                      height: 50,
+                      decoration: BoxDecoration(
+                        color: _selectedEmotions[index].color,
+                        borderRadius: BorderRadius.circular(25),
+                      ),
+                      child: IconButton(
+                        icon: const Icon(Icons.close),
+                        color: Colors.white,
+                        onPressed: () => _removeEmotion(index),
+                      ),
+                    ),
+                  ),
+              ],
+            ),
+          ),
+        ]),
+        floatingActionButton: Row(
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: [
+            if (currentEmotion != null && _selectedEmotions.length < 3)
+              FloatingActionButton(
+                heroTag: 'addEmotion',
+                onPressed: () => pushEmotion(currentEmotion!),
+                child: const Icon(Icons.add),
+              ),
+            const SizedBox(width: 16),
+            if (_selectedEmotions.isNotEmpty && _selectedEmotions.length < 3)
+              FloatingActionButton(
+                heroTag: 'submitEmotions',
+                onPressed: _submitEmotions,
+                child: const Icon(Icons.arrow_forward),
+              ),
+          ],
+        ));
   }
 
   Widget _buildEmotionWheels() => ListView.builder(

@@ -27,4 +27,38 @@ class EmotionLog extends Equatable {
 
   @override
   bool get stringify => true;
+
+  /// Factory constructor to create an EmotionLog from a list of emotions.
+  factory EmotionLog.fromEmotions({
+    required List<Emotion> emotions,
+    required DateTime date,
+    EmotionLogID? id,
+  }) {
+    assert(emotions.isNotEmpty && emotions.length <= 3,
+        'Emotions list must contain between 1 and 3 items.');
+    return EmotionLog(
+      emotion1: emotions[0],
+      emotion2: emotions.length > 1 ? emotions[1] : null,
+      emotion3: emotions.length > 2 ? emotions[2] : null,
+      date: date,
+      id: id,
+    );
+  }
+
+  /// Creates a copy of the current EmotionLog with updated values.
+  EmotionLog copyWith({
+    Emotion? emotion1,
+    Emotion? emotion2,
+    Emotion? emotion3,
+    DateTime? date,
+    EmotionLogID? id,
+  }) {
+    return EmotionLog(
+      emotion1: emotion1 ?? this.emotion1,
+      emotion2: emotion2 ?? this.emotion2,
+      emotion3: emotion3 ?? this.emotion3,
+      date: date ?? this.date,
+      id: id ?? this.id,
+    );
+  }
 }

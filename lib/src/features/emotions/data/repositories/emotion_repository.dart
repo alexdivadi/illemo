@@ -9,6 +9,7 @@ import 'package:illemo/src/features/emotions/domain/entities/emotion_log.dart';
 import 'package:illemo/src/features/emotions/domain/models/emotion_log_model.dart';
 import 'package:illemo/src/utils/shared_preferences_provider.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 part 'emotion_repository.g.dart';
 
@@ -28,20 +29,26 @@ class EmotionRepository {
   /// Adds a new emotion log to Firestore.
   ///
   /// Converts the [EmotionLog] entity to a map using [EmotionLogModel] before adding it.
-  Future<void> addEmotionLog(EmotionLog emotionLog) async {
-    await _firestore
-        .collection(emotionsPath(userID))
-        .add(EmotionLogModel.fromEntity(emotionLog).toMap());
+  Future<EmotionLogID> addEmotionLog(EmotionLog emotionLog) async {
+    final EmotionLogModel emotionLogModel = EmotionLogModel.fromEntity(emotionLog);
+    final docRef = _firestore.collection(emotionsPath(userID)).doc(emotionLogModel.id);
+    await docRef.set(emotionLogModel.toMap());
+    return emotionLogModel.id;
   }
 
   /// Updates an existing emotion log in Firestore.
   ///
   /// Converts the [EmotionLog] entity to a map using [EmotionLogModel] before updating it.
   Future<void> updateEmotionLog(EmotionLogID id, EmotionLog emotionLog) async {
-    await _firestore
-        .collection(emotionsPath(userID))
-        .doc(id)
-        .update(EmotionLogModel.fromEntity(emotionLog, id: id).toMap());
+    final docRef = _firestore.collection(emotionsPath(userID)).doc(id);
+    final emotionLogModel = EmotionLogModel.fromEntity(emotionLog, id: id);
+    final doc = await docRef.get();
+    if (doc.exists) {
+      await docRef.update(emotionLogModel.toMap());
+    } else {
+      await docRef.set(emotionLogModel.toMap());
+    }
+    log("Updated emotion log with ID: $id");
   }
 
   /// Deletes an emotion log from Firestore by its document ID.
@@ -114,7 +121,7 @@ EmotionRepository emotionRepository(Ref ref) {
 
   if (currentUser.isAnonymous) {
     log('Using local storage for anonymous user');
-    final prefs = ref.watch(sharedPreferencesProvider).requireValue;
+    final SharedPreferencesWithCache prefs = ref.watch(sharedPreferencesProvider).requireValue;
     return EmotionRepositoryLocal(userID: currentUser.uid, prefs: prefs);
   }
   log('Using firestore for authenticated user');
