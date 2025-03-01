@@ -127,7 +127,11 @@ class _EmotionPickerScreenState extends ConsumerState<EmotionPickerScreen> {
             Center(
               child: ElevatedButton(
                 onPressed: _submitEmotions,
-                child: const Text('Submit'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.greenAccent,
+                  padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+                ),
+                child: const Text('Submit :)', style: TextStyle(fontSize: 24, color: Colors.black)),
               ),
             ),
           Positioned(
@@ -162,6 +166,7 @@ class _EmotionPickerScreenState extends ConsumerState<EmotionPickerScreen> {
             if (currentEmotion != null && _selectedEmotions.length < 3)
               FloatingActionButton(
                 heroTag: 'addEmotion',
+                backgroundColor: Colors.greenAccent,
                 onPressed: () => pushEmotion(currentEmotion!),
                 child: const Icon(Icons.add),
               ),
@@ -169,6 +174,7 @@ class _EmotionPickerScreenState extends ConsumerState<EmotionPickerScreen> {
             if (_selectedEmotions.isNotEmpty && _selectedEmotions.length < 3)
               FloatingActionButton(
                 heroTag: 'submitEmotions',
+                backgroundColor: Colors.grey,
                 onPressed: _submitEmotions,
                 child: const Icon(Icons.arrow_forward),
               ),
@@ -191,31 +197,33 @@ class _EmotionPickerScreenState extends ConsumerState<EmotionPickerScreen> {
                 direction: Axis.vertical,
                 children: emotions.map((emotion) {
                   return InkWell(
-                    onTap: () {
-                      log('Selected emotion: $emotion');
-                      setState(() {
-                        currentEmotion = emotion;
-                      });
-                      _controllerHorizontal.animateTo(
-                        _controllerHorizontal.position.minScrollExtent +
-                            200 * category.index.toDouble() -
-                            100,
-                        duration: const Duration(milliseconds: 200),
-                        curve: Curves.easeInOut,
-                      );
-                      _verticalControllers[category]!.animateToItem(
-                        emotions.indexOf(emotion),
-                        itemExtent: 200,
-                        itemCount: emotions.length,
-                        duration: const Duration(milliseconds: 500),
-                        curve: Curves.easeInOut,
-                      );
-                    },
+                    onTap: _selectedEmotions.contains(emotion)
+                        ? null
+                        : () {
+                            log('Selected emotion: $emotion');
+                            setState(() {
+                              currentEmotion = emotion;
+                            });
+                            _controllerHorizontal.animateTo(
+                              _controllerHorizontal.position.minScrollExtent +
+                                  200 * category.index.toDouble() -
+                                  100,
+                              duration: const Duration(milliseconds: 200),
+                              curve: Curves.easeInOut,
+                            );
+                            _verticalControllers[category]!.animateToItem(
+                              emotions.indexOf(emotion),
+                              itemExtent: 200,
+                              itemCount: emotions.length,
+                              duration: const Duration(milliseconds: 500),
+                              curve: Curves.easeInOut,
+                            );
+                          },
                     child: Container(
                       width: 200,
                       height: 200,
                       decoration: BoxDecoration(
-                        color: emotion.color,
+                        color: _selectedEmotions.contains(emotion) ? Colors.grey : emotion.color,
                         border: currentEmotion == emotion
                             ? Border.all(color: Colors.white, width: 3)
                             : null,
@@ -227,7 +235,9 @@ class _EmotionPickerScreenState extends ConsumerState<EmotionPickerScreen> {
                             fontSize: 24,
                             fontWeight:
                                 currentEmotion == emotion ? FontWeight.bold : FontWeight.normal,
-                            color: currentEmotion == emotion ? Colors.white : Colors.black,
+                            color: currentEmotion == emotion || _selectedEmotions.contains(emotion)
+                                ? Colors.white
+                                : Colors.black,
                           ),
                         ),
                       ),

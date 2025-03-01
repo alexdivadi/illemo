@@ -22,6 +22,10 @@ class EmotionLog extends Equatable {
   /// Optional parameter for tracking doc id in firestore.
   final EmotionLogID? id;
 
+  /// Returns a list of emotions in the log.
+  List<Emotion> get emotions =>
+      [emotion1, if (emotion2 != null) emotion2!, if (emotion3 != null) emotion3!];
+
   @override
   List<Object?> get props => [emotion1, emotion2, emotion3, date];
 
