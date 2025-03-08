@@ -212,7 +212,7 @@ class _EmotionPickerScreenState extends ConsumerState<EmotionPickerScreen> {
                 direction: Axis.vertical,
                 children: emotions.map((emotion) {
                   return InkWell(
-                    onDoubleTap: () => pushEmotion(emotion),
+                    onLongPress: () => pushEmotion(emotion),
                     onTap: _selectedEmotions.contains(emotion)
                         ? null
                         : () {
