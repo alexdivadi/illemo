@@ -11,6 +11,8 @@ class EmotionLog extends Equatable {
     this.id,
   });
 
+  static const logSize = 3;
+
   /// Only first emotion is required. Stored in db as id (int).
   final Emotion emotion1;
   final Emotion? emotion2;
@@ -38,8 +40,8 @@ class EmotionLog extends Equatable {
     required DateTime date,
     EmotionLogID? id,
   }) {
-    assert(emotions.isNotEmpty && emotions.length <= 3,
-        'Emotions list must contain between 1 and 3 items.');
+    assert(emotions.isNotEmpty && emotions.length <= EmotionLog.logSize,
+        'Emotions list must contain between 1 and $logSize items.');
     return EmotionLog(
       emotion1: emotions[0],
       emotion2: emotions.length > 1 ? emotions[1] : null,

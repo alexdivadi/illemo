@@ -1,4 +1,6 @@
+import 'dart:async';
 import 'dart:convert';
+import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:illemo/src/features/authentication/domain/app_user.dart';
@@ -11,10 +13,14 @@ import 'package:shared_preferences/shared_preferences.dart';
 /// Local implementation of [EmotionRepository].
 /// Depends on [sharedPreferencesProvider] for storing data.
 class EmotionRepositoryLocal implements EmotionRepository {
-  const EmotionRepositoryLocal({
+  EmotionRepositoryLocal({
     required this.userID,
     required this.prefs,
-  });
+  }) {
+    _emotionLogTodayController = StreamController<EmotionLog?>.broadcast(
+      onListen: _emitCurrentEmotionLogToday,
+    );
+  }
 
   /// The path used for storing emotion logs in shared preferences.
   final String _collectionPath = 'emotions';
@@ -24,6 +30,23 @@ class EmotionRepositoryLocal implements EmotionRepository {
   @override
   final UserID userID;
 
+  late final StreamController<EmotionLog?> _emotionLogTodayController;
+
+  /// Emits the current emotion log for today to the stream.
+  void _emitCurrentEmotionLogToday() {
+    final key = '${_collectionPath}_${DateTime.now().weekday}';
+    final jsonString = prefs.getString(key);
+    if (jsonString != null) {
+      final EmotionLog emotionLog = EmotionLogModel.fromMap(jsonDecode(jsonString)).toEntity();
+      if (DateUtils.isSameDay(emotionLog.date, DateTime.now())) {
+        _emotionLogTodayController.add(emotionLog);
+        log('Stream updated: Emotion log for today is $emotionLog');
+        return;
+      }
+    }
+    _emotionLogTodayController.add(null);
+  }
+
   /// Adds a new emotion log to the local storage.
   ///
   /// [emotionLog] - The emotion log to be added.
@@ -32,6 +55,11 @@ class EmotionRepositoryLocal implements EmotionRepository {
     final key = '${_collectionPath}_${emotionLog.date.weekday}';
     final EmotionLogModel emotionLogModel = EmotionLogModel.fromEntity(emotionLog);
     await prefs.setString(key, jsonEncode(emotionLogModel.toMap()));
+
+    if (DateUtils.isSameDay(emotionLog.date, DateTime.now())) {
+      // Updates today's log
+      _emitCurrentEmotionLogToday();
+    }
     return emotionLogModel.id;
   }
 
@@ -44,6 +72,11 @@ class EmotionRepositoryLocal implements EmotionRepository {
     /// id is the weekday (only stores up to 7 entries)
     final key = '${_collectionPath}_${emotionLog.date.weekday}';
     await prefs.setString(key, jsonEncode(EmotionLogModel.fromEntity(emotionLog, id: id).toMap()));
+
+    if (DateUtils.isSameDay(emotionLog.date, DateTime.now())) {
+      // Updates today's log
+      _emitCurrentEmotionLogToday();
+    }
   }
 
   /// Deletes an emotion log from the local storage.
@@ -53,6 +86,7 @@ class EmotionRepositoryLocal implements EmotionRepository {
   Future<void> deleteEmotionLog(String id) async {
     final key = '${_collectionPath}_$id';
     await prefs.remove(key);
+    _emitCurrentEmotionLogToday(); // Updates today's log
   }
 
   /// Retrieves an emotion log by its identifier from the local storage.
@@ -73,17 +107,7 @@ class EmotionRepositoryLocal implements EmotionRepository {
   ///
   /// Returns the emotion log if found and the date matches today, otherwise returns null.
   @override
-  Future<EmotionLog?> getEmotionLogToday() async {
-    final key = '${_collectionPath}_${DateTime.now().weekday}';
-    final jsonString = prefs.getString(key);
-    if (jsonString != null) {
-      final EmotionLog emotionLog = EmotionLogModel.fromMap(jsonDecode(jsonString)).toEntity();
-      if (DateUtils.isSameDay(emotionLog.date, DateTime.now())) {
-        return emotionLog;
-      }
-    }
-    return null;
-  }
+  Stream<EmotionLog?> getEmotionLogToday() => _emotionLogTodayController.stream;
 
   /// Retrieves a stream of emotion logs within the specified date range from the local storage.
   ///

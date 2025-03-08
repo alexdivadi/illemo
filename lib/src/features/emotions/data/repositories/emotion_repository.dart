@@ -9,6 +9,7 @@ import 'package:illemo/src/features/emotions/domain/entities/emotion_log.dart';
 import 'package:illemo/src/features/emotions/domain/models/emotion_log_model.dart';
 import 'package:illemo/src/utils/shared_preferences_provider.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:rxdart/transformers.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 part 'emotion_repository.g.dart';
@@ -70,17 +71,18 @@ class EmotionRepository {
   /// Retrieves today's emotion log from Firestore.
   ///
   /// Returns the [EmotionLog] entity if found, otherwise returns null.
-  Future<EmotionLog?> getEmotionLogToday() async {
-    QuerySnapshot querySnapshot = await _firestore
+  Stream<EmotionLog?> getEmotionLogToday() {
+    return _firestore
         .collection(emotionsPath(userID))
         .where('date', isEqualTo: DateTime.now().toIso8601String().split('T').first)
         .limit(1)
-        .get();
-    if (querySnapshot.docs.isNotEmpty) {
-      return EmotionLogModel.fromMap(querySnapshot.docs.first.data() as Map<String, dynamic>)
-          .toEntity();
-    }
-    return null;
+        .snapshots()
+        .map((querySnapshot) {
+      if (querySnapshot.docs.isNotEmpty) {
+        return EmotionLogModel.fromMap(querySnapshot.docs.first.data()).toEntity();
+      }
+      return null;
+    });
   }
 
   /// Streams a list of emotion logs from Firestore within an optional date range.

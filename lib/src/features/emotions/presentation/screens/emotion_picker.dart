@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:illemo/src/common_widgets/looping_listview.dart';
+import 'package:illemo/src/constants/app_sizes.dart';
 import 'package:illemo/src/features/emotions/domain/entities/emotion_log.dart';
 import 'package:illemo/src/features/emotions/domain/models/category.dart';
 import 'package:illemo/src/features/emotions/domain/models/emotion.dart';
@@ -47,7 +48,7 @@ class _EmotionPickerScreenState extends ConsumerState<EmotionPickerScreen> {
   }
 
   void pushEmotion(Emotion emotion) {
-    if (_selectedEmotions.length < 3) {
+    if (_selectedEmotions.length < EmotionLog.logSize) {
       setState(() {
         _selectedEmotions.add(emotion);
         currentEmotion = null;
@@ -111,7 +112,7 @@ class _EmotionPickerScreenState extends ConsumerState<EmotionPickerScreen> {
               ),
             ),
           ),
-          if (_selectedEmotions.length >= 3)
+          if (_selectedEmotions.length >= EmotionLog.logSize)
             Positioned(
               top: 0,
               left: 0,
@@ -123,15 +124,16 @@ class _EmotionPickerScreenState extends ConsumerState<EmotionPickerScreen> {
                 ),
               ),
             ),
-          if (_selectedEmotions.length >= 3)
+          if (_selectedEmotions.length >= EmotionLog.logSize)
             Center(
               child: ElevatedButton(
                 onPressed: _submitEmotions,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.greenAccent,
-                  padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+                  padding: const EdgeInsets.symmetric(horizontal: Sizes.p32, vertical: Sizes.p16),
                 ),
-                child: const Text('Submit :)', style: TextStyle(fontSize: 24, color: Colors.black)),
+                child: const Text('Submit :)',
+                    style: TextStyle(fontSize: Sizes.p24, color: Colors.black)),
               ),
             ),
           Positioned(
@@ -141,13 +143,13 @@ class _EmotionPickerScreenState extends ConsumerState<EmotionPickerScreen> {
               children: [
                 for (int index = 0; index < _selectedEmotions.length; index++)
                   Padding(
-                    padding: const EdgeInsets.only(right: 8),
+                    padding: const EdgeInsets.only(right: Sizes.p8),
                     child: Container(
                       width: 50,
                       height: 50,
                       decoration: BoxDecoration(
                         color: _selectedEmotions[index].color,
-                        borderRadius: BorderRadius.circular(25),
+                        borderRadius: BorderRadius.circular(Sizes.p24),
                       ),
                       child: IconButton(
                         icon: const Icon(Icons.close),
@@ -170,8 +172,8 @@ class _EmotionPickerScreenState extends ConsumerState<EmotionPickerScreen> {
                 onPressed: () => pushEmotion(currentEmotion!),
                 child: const Icon(Icons.add),
               ),
-            const SizedBox(width: 16),
-            if (_selectedEmotions.isNotEmpty && _selectedEmotions.length < 3)
+            const SizedBox(width: Sizes.p16),
+            if (_selectedEmotions.isNotEmpty && _selectedEmotions.length < EmotionLog.logSize)
               FloatingActionButton(
                 heroTag: 'submitEmotions',
                 backgroundColor: Colors.grey,
@@ -197,6 +199,7 @@ class _EmotionPickerScreenState extends ConsumerState<EmotionPickerScreen> {
                 direction: Axis.vertical,
                 children: emotions.map((emotion) {
                   return InkWell(
+                    onDoubleTap: () => pushEmotion(emotion),
                     onTap: _selectedEmotions.contains(emotion)
                         ? null
                         : () {
@@ -232,12 +235,10 @@ class _EmotionPickerScreenState extends ConsumerState<EmotionPickerScreen> {
                         child: Text(
                           '$emotion',
                           style: TextStyle(
-                            fontSize: 24,
+                            fontSize: Sizes.p24,
                             fontWeight:
                                 currentEmotion == emotion ? FontWeight.bold : FontWeight.normal,
-                            color: currentEmotion == emotion || _selectedEmotions.contains(emotion)
-                                ? Colors.white
-                                : Colors.black,
+                            color: currentEmotion == emotion ? Colors.white : Colors.black,
                           ),
                         ),
                       ),

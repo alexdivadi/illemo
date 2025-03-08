@@ -30,7 +30,7 @@ class OnboardingScreen extends ConsumerWidget {
             ),
             gapH16,
             SvgPicture.asset(
-              'assets/time-tracking.svg',
+              'assets/common/time-tracking.svg',
               width: 200,
               height: 200,
               semanticsLabel: 'Time tracking logo',
