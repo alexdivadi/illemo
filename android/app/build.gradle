@@ -45,12 +45,12 @@ android {
     productFlavors {
         dev {
             dimension = "app"
-            resValue(type = "string", name = "app_name", value = "[DEV] Illemo")
+            resValue "string", "app_name", "[DEV] Illemo"
             applicationIdSuffix = ".dev"
         }
         prod {
             dimension = "app"
-            resValue(type = "string", name = "app_name", value = "Illemo")
+            resValue "string", "app_name", "Illemo"
             applicationId = "com.illemo.app"
         }
     }

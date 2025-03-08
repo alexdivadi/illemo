@@ -9,7 +9,6 @@ import 'package:illemo/src/features/emotions/presentation/screens/dashboard.dart
 import 'package:illemo/src/features/emotions/presentation/screens/emotion_picker.dart';
 import 'package:illemo/src/features/emotions/presentation/screens/emotion_upload.dart';
 import 'package:illemo/src/features/entries/domain/entry.dart';
-import 'package:illemo/src/features/entries/presentation/entries_screen.dart';
 import 'package:illemo/src/features/entries/presentation/entry_screen/entry_screen.dart';
 import 'package:illemo/src/features/jobs/domain/job.dart';
 import 'package:illemo/src/features/jobs/presentation/edit_job_screen/edit_job_screen.dart';

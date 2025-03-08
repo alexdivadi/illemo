@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:illemo/src/constants/app_sizes.dart';
 import 'package:illemo/src/features/emotions/data/providers/emotion_calendar.dart';
 import 'package:illemo/src/features/emotions/presentation/widgets/emotion_calendar.dart';
 
@@ -19,6 +20,7 @@ class CalendarScreen extends ConsumerWidget {
     final currentDate = date ?? today;
     final emotionLogs = ref.watch(emotionCalendarProvider(currentDate));
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       appBar: AppBar(
         title: const Text(title),
       ),
@@ -26,7 +28,7 @@ class CalendarScreen extends ConsumerWidget {
         child: emotionLogs.when(
           data: (emotionLogs) {
             return Padding(
-              padding: const EdgeInsets.all(8.0),
+              padding: const EdgeInsets.all(Sizes.p8),
               child: EmotionCalendar(emotionLogs: emotionLogs, currentDate: currentDate),
             );
           },
