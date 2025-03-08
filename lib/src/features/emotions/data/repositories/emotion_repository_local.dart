@@ -20,6 +20,9 @@ class EmotionRepositoryLocal implements EmotionRepository {
     _emotionLogTodayController = StreamController<EmotionLog?>.broadcast(
       onListen: _emitCurrentEmotionLogToday,
     );
+    _emotionLogsController = StreamController<List<EmotionLog>>.broadcast(
+      onListen: _emitCurrentEmotionLogs,
+    );
   }
 
   /// The path used for storing emotion logs in shared preferences.
@@ -30,7 +33,11 @@ class EmotionRepositoryLocal implements EmotionRepository {
   @override
   final UserID userID;
 
+  @override
+  bool get isOffline => true;
+
   late final StreamController<EmotionLog?> _emotionLogTodayController;
+  late final StreamController<List<EmotionLog>> _emotionLogsController;
 
   /// Emits the current emotion log for today to the stream.
   void _emitCurrentEmotionLogToday() {
@@ -47,6 +54,20 @@ class EmotionRepositoryLocal implements EmotionRepository {
     _emotionLogTodayController.add(null);
   }
 
+  /// Emits the current emotion logs to the stream.
+  void _emitCurrentEmotionLogs() {
+    final keys = prefs.keys.where((key) => key.startsWith(_collectionPath));
+    final logs = <EmotionLog>[];
+    for (final key in keys) {
+      final jsonString = prefs.getString(key);
+      if (jsonString != null) {
+        final emotionLog = EmotionLogModel.fromMap(jsonDecode(jsonString)).toEntity();
+        logs.add(emotionLog);
+      }
+    }
+    _emotionLogsController.add(logs);
+  }
+
   /// Adds a new emotion log to the local storage.
   ///
   /// [emotionLog] - The emotion log to be added.
@@ -55,6 +76,7 @@ class EmotionRepositoryLocal implements EmotionRepository {
     final key = '${_collectionPath}_${emotionLog.date.weekday}';
     final EmotionLogModel emotionLogModel = EmotionLogModel.fromEntity(emotionLog);
     await prefs.setString(key, jsonEncode(emotionLogModel.toMap()));
+    _emitCurrentEmotionLogs();
 
     if (DateUtils.isSameDay(emotionLog.date, DateTime.now())) {
       // Updates today's log
@@ -72,6 +94,7 @@ class EmotionRepositoryLocal implements EmotionRepository {
     /// id is the weekday (only stores up to 7 entries)
     final key = '${_collectionPath}_${emotionLog.date.weekday}';
     await prefs.setString(key, jsonEncode(EmotionLogModel.fromEntity(emotionLog, id: id).toMap()));
+    _emitCurrentEmotionLogs();
 
     if (DateUtils.isSameDay(emotionLog.date, DateTime.now())) {
       // Updates today's log
@@ -86,6 +109,7 @@ class EmotionRepositoryLocal implements EmotionRepository {
   Future<void> deleteEmotionLog(String id) async {
     final key = '${_collectionPath}_$id';
     await prefs.remove(key);
+    _emitCurrentEmotionLogs();
     _emitCurrentEmotionLogToday(); // Updates today's log
   }
 
@@ -118,19 +142,20 @@ class EmotionRepositoryLocal implements EmotionRepository {
   Stream<List<EmotionLog>> getEmotionLogs({
     DateTime? startDate,
     DateTime? endDate,
-  }) async* {
-    final keys = prefs.keys.where((key) => key.startsWith(_collectionPath));
-    final logs = <EmotionLog>[];
-    for (final key in keys) {
-      final jsonString = prefs.getString(key);
-      if (jsonString != null) {
-        final emotionLog = EmotionLogModel.fromMap(jsonDecode(jsonString)).toEntity();
-        if ((startDate == null || emotionLog.date.isAfter(startDate)) &&
-            (endDate == null || emotionLog.date.isBefore(endDate))) {
-          logs.add(emotionLog);
-        }
-      }
-    }
-    yield logs;
+  }) =>
+      _emotionLogsController.stream.map((logs) {
+        return logs.where((log) {
+          final date = log.date;
+          final isAfterStartDate = startDate == null || date.isAfter(startDate);
+          final isBeforeEndDate = endDate == null || date.isBefore(endDate);
+          return isAfterStartDate && isBeforeEndDate;
+        }).toList();
+      });
+
+  /// Disposes the stream controller.
+  @override
+  void dispose() {
+    _emotionLogTodayController.close();
+    _emotionLogsController.close();
   }
 }

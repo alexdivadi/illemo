@@ -47,6 +47,11 @@ class _EmotionPickerScreenState extends ConsumerState<EmotionPickerScreen> {
     }
   }
 
+  /// Adds the given [emotion] to the list of selected emotions if the list size is less than the maximum log size.
+  ///
+  /// This method updates the state to include the new emotion and sets the current emotion to null.
+  ///
+  /// [emotion] - The emotion to be added.
   void pushEmotion(Emotion emotion) {
     if (_selectedEmotions.length < EmotionLog.logSize) {
       setState(() {
@@ -56,12 +61,20 @@ class _EmotionPickerScreenState extends ConsumerState<EmotionPickerScreen> {
     }
   }
 
+  /// Removes the emotion at the given [index] from the list of selected emotions.
+  ///
+  /// This method updates the state to remove the emotion and sets the current emotion to the removed emotion.
+  ///
+  /// [index] - The index of the emotion to be removed.
   void _removeEmotion(int index) {
     setState(() {
       currentEmotion = _selectedEmotions.removeAt(index);
     });
   }
 
+  /// Submits the selected emotions by navigating to the EmotionUpload screen.
+  ///
+  /// This method passes the list of selected emotion IDs and the ID of today's emotion log as extra data.
   void _submitEmotions() {
     context.go(EmotionUpload.path, extra: {
       'emotionIDs': _selectedEmotions.map((e) => e.id).toList(),
@@ -238,7 +251,9 @@ class _EmotionPickerScreenState extends ConsumerState<EmotionPickerScreen> {
                             fontSize: Sizes.p24,
                             fontWeight:
                                 currentEmotion == emotion ? FontWeight.bold : FontWeight.normal,
-                            color: currentEmotion == emotion ? Colors.white : Colors.black,
+                            color: _selectedEmotions.contains(emotion)
+                                ? Colors.black
+                                : emotion.textColor,
                           ),
                         ),
                       ),

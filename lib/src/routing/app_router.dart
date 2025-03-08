@@ -35,6 +35,7 @@ enum AppRoute {
   onboarding,
   signIn,
   calendar,
+  calendarDate,
   jobs,
   job,
   addJob,
@@ -222,6 +223,16 @@ GoRouter goRouter(Ref ref) {
                 pageBuilder: (context, state) => const NoTransitionPage(
                   child: CalendarScreen(),
                 ),
+                routes: [
+                  GoRoute(
+                    path: ':date',
+                    name: AppRoute.calendarDate.name,
+                    builder: (context, state) {
+                      final date = DateTime.parse(state.pathParameters['date']!);
+                      return CalendarScreen(date: date);
+                    },
+                  ),
+                ],
               ),
             ],
           ),

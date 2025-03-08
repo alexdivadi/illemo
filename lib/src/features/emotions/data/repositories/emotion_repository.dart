@@ -9,7 +9,6 @@ import 'package:illemo/src/features/emotions/domain/entities/emotion_log.dart';
 import 'package:illemo/src/features/emotions/domain/models/emotion_log_model.dart';
 import 'package:illemo/src/utils/shared_preferences_provider.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import 'package:rxdart/transformers.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 part 'emotion_repository.g.dart';
@@ -27,14 +26,27 @@ class EmotionRepository {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final UserID userID;
 
+  bool get isOffline => false;
+
   /// Adds a new emotion log to Firestore.
   ///
   /// Converts the [EmotionLog] entity to a map using [EmotionLogModel] before adding it.
   Future<EmotionLogID> addEmotionLog(EmotionLog emotionLog) async {
     final EmotionLogModel emotionLogModel = EmotionLogModel.fromEntity(emotionLog);
-    final docRef = _firestore.collection(emotionsPath(userID)).doc(emotionLogModel.id);
-    await docRef.set(emotionLogModel.toMap());
-    return emotionLogModel.id;
+    final collectionRef = _firestore.collection(emotionsPath(userID));
+    // Check if date already exists. Try to enforce unique date constraint.
+    final querySnapshot =
+        await collectionRef.where('date', isEqualTo: emotionLogModel.date).limit(1).get();
+
+    if (querySnapshot.docs.isNotEmpty) {
+      final docRef = querySnapshot.docs.first.reference;
+      await docRef.update(emotionLogModel.toMap());
+      return docRef.id;
+    } else {
+      final docRef = collectionRef.doc(emotionLogModel.id);
+      await docRef.set(emotionLogModel.toMap());
+      return emotionLogModel.id;
+    }
   }
 
   /// Updates an existing emotion log in Firestore.
@@ -103,13 +115,14 @@ class EmotionRepository {
     if (endDate != null) {
       query = query.where('date', isLessThanOrEqualTo: endDate.toIso8601String().split('T').first);
     }
-
     return query.snapshots().map((snapshot) {
       return snapshot.docs
           .map((doc) => EmotionLogModel.fromMap(doc.data() as Map<String, dynamic>).toEntity())
           .toList();
     });
   }
+
+  void dispose() {}
 }
 
 /// Provider for [EmotionRepository].
@@ -121,11 +134,20 @@ EmotionRepository emotionRepository(Ref ref) {
     throw AssertionError('User can\'t be null when fetching emotions');
   }
 
+  final EmotionRepository emotionRepository;
+
   if (currentUser.isAnonymous) {
     log('Using local storage for anonymous user');
     final SharedPreferencesWithCache prefs = ref.watch(sharedPreferencesProvider).requireValue;
-    return EmotionRepositoryLocal(userID: currentUser.uid, prefs: prefs);
+    emotionRepository = EmotionRepositoryLocal(userID: currentUser.uid, prefs: prefs);
+  } else {
+    log('Using firestore for authenticated user');
+    emotionRepository = EmotionRepository(userID: currentUser.uid);
   }
-  log('Using firestore for authenticated user');
-  return EmotionRepository(userID: currentUser.uid);
+
+  ref.onDispose(() {
+    emotionRepository.dispose();
+  });
+
+  return emotionRepository;
 }
