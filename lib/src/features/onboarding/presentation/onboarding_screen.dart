@@ -24,13 +24,19 @@ class OnboardingScreen extends ConsumerWidget {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Text(
-              'Track your time.\nBecause time counts.',
+              'Welcome to Illemo',
               style: Theme.of(context).textTheme.headlineSmall,
+              textAlign: TextAlign.center,
+            ),
+            gapH8,
+            Text(
+              'Track your emotions daily and improve your mental health',
+              style: Theme.of(context).textTheme.labelLarge,
               textAlign: TextAlign.center,
             ),
             gapH16,
             SvgPicture.asset(
-              'assets/time-tracking.svg',
+              'assets/common/time-tracking.svg',
               width: 200,
               height: 200,
               semanticsLabel: 'Time tracking logo',

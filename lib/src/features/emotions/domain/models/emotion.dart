@@ -94,6 +94,12 @@ enum Emotion {
   final int tier;
 
   Color get color => category.getColor(tier);
+  Color get textColor {
+    // Calculate the luminance of the background color
+    double luminance = color.computeLuminance();
+    // Return black for light backgrounds and white for dark backgrounds
+    return luminance > 0.5 ? Colors.black : Colors.white;
+  }
 
   static final Map<int, Emotion> _emotionById = {
     for (var emotion in Emotion.values) emotion.id: emotion

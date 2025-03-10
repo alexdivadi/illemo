@@ -4,11 +4,11 @@ import 'package:illemo/src/features/authentication/data/firebase_auth_repository
 import 'package:illemo/src/features/authentication/presentation/custom_profile_screen.dart';
 import 'package:illemo/src/features/authentication/presentation/custom_sign_in_screen.dart';
 import 'package:illemo/src/features/emotions/domain/entities/emotion_log.dart';
+import 'package:illemo/src/features/emotions/presentation/screens/calendar.dart';
 import 'package:illemo/src/features/emotions/presentation/screens/dashboard.dart';
 import 'package:illemo/src/features/emotions/presentation/screens/emotion_picker.dart';
 import 'package:illemo/src/features/emotions/presentation/screens/emotion_upload.dart';
 import 'package:illemo/src/features/entries/domain/entry.dart';
-import 'package:illemo/src/features/entries/presentation/entries_screen.dart';
 import 'package:illemo/src/features/entries/presentation/entry_screen/entry_screen.dart';
 import 'package:illemo/src/features/jobs/domain/job.dart';
 import 'package:illemo/src/features/jobs/presentation/edit_job_screen/edit_job_screen.dart';
@@ -33,6 +33,8 @@ final _accountNavigatorKey = GlobalKey<NavigatorState>(debugLabel: 'account');
 enum AppRoute {
   onboarding,
   signIn,
+  calendar,
+  calendarDate,
   jobs,
   job,
   addJob,
@@ -73,7 +75,7 @@ GoRouter goRouter(Ref ref) {
         }
       } else {
         if (path.startsWith('/onboarding') ||
-            path.startsWith('/jobs') ||
+            path.startsWith(CalendarScreen.path) ||
             path.startsWith(EmotionPickerScreen.path) ||
             path.startsWith(DashboardScreen.path) ||
             path.startsWith('/entries') ||
@@ -215,11 +217,21 @@ GoRouter goRouter(Ref ref) {
             navigatorKey: _entriesNavigatorKey,
             routes: [
               GoRoute(
-                path: '/entries',
-                name: AppRoute.entries.name,
+                path: CalendarScreen.path,
+                name: AppRoute.calendar.name,
                 pageBuilder: (context, state) => const NoTransitionPage(
-                  child: EntriesScreen(),
+                  child: CalendarScreen(),
                 ),
+                routes: [
+                  GoRoute(
+                    path: ':date',
+                    name: AppRoute.calendarDate.name,
+                    builder: (context, state) {
+                      final date = DateTime.parse(state.pathParameters['date']!);
+                      return CalendarScreen(date: date);
+                    },
+                  ),
+                ],
               ),
             ],
           ),

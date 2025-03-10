@@ -63,14 +63,14 @@ class ScaffoldWithNavigationBar extends StatelessWidget {
         destinations: [
           // products
           NavigationDestination(
-            icon: const Icon(Icons.work_outline),
-            selectedIcon: const Icon(Icons.work),
-            label: 'Jobs'.hardcoded,
+            icon: const Icon(Icons.dashboard_outlined),
+            selectedIcon: const Icon(Icons.dashboard),
+            label: 'Dashboard'.hardcoded,
           ),
           NavigationDestination(
-            icon: const Icon(Icons.view_headline_outlined),
-            selectedIcon: const Icon(Icons.view_headline),
-            label: 'Entries'.hardcoded,
+            icon: const Icon(Icons.calendar_month_outlined),
+            selectedIcon: const Icon(Icons.calendar_month),
+            label: 'Calendar'.hardcoded,
           ),
           NavigationDestination(
             icon: const Icon(Icons.person_outline),
@@ -106,14 +106,14 @@ class ScaffoldWithNavigationRail extends StatelessWidget {
             labelType: NavigationRailLabelType.all,
             destinations: <NavigationRailDestination>[
               NavigationRailDestination(
-                icon: const Icon(Icons.work_outline),
-                selectedIcon: const Icon(Icons.work),
-                label: Text('Jobs'.hardcoded),
+                icon: const Icon(Icons.dashboard_outlined),
+                selectedIcon: const Icon(Icons.dashboard),
+                label: Text('Dashboard'.hardcoded),
               ),
               NavigationRailDestination(
-                icon: const Icon(Icons.view_headline_outlined),
-                selectedIcon: const Icon(Icons.view_headline),
-                label: Text('Entries'.hardcoded),
+                icon: const Icon(Icons.calendar_month_outlined),
+                selectedIcon: const Icon(Icons.calendar_month),
+                label: Text('Calendar'.hardcoded),
               ),
               NavigationRailDestination(
                 icon: const Icon(Icons.person_outline),

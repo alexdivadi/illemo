@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:illemo/src/common_widgets/looping_listview.dart';
+import 'package:illemo/src/constants/app_sizes.dart';
 import 'package:illemo/src/features/emotions/domain/entities/emotion_log.dart';
 import 'package:illemo/src/features/emotions/domain/models/category.dart';
 import 'package:illemo/src/features/emotions/domain/models/emotion.dart';
@@ -46,8 +47,13 @@ class _EmotionPickerScreenState extends ConsumerState<EmotionPickerScreen> {
     }
   }
 
+  /// Adds the given [emotion] to the list of selected emotions if the list size is less than the maximum log size.
+  ///
+  /// This method updates the state to include the new emotion and sets the current emotion to null.
+  ///
+  /// [emotion] - The emotion to be added.
   void pushEmotion(Emotion emotion) {
-    if (_selectedEmotions.length < 3) {
+    if (_selectedEmotions.length < EmotionLog.logSize && !_selectedEmotions.contains(emotion)) {
       setState(() {
         _selectedEmotions.add(emotion);
         currentEmotion = null;
@@ -55,12 +61,20 @@ class _EmotionPickerScreenState extends ConsumerState<EmotionPickerScreen> {
     }
   }
 
+  /// Removes the emotion at the given [index] from the list of selected emotions.
+  ///
+  /// This method updates the state to remove the emotion and sets the current emotion to the removed emotion.
+  ///
+  /// [index] - The index of the emotion to be removed.
   void _removeEmotion(int index) {
     setState(() {
       currentEmotion = _selectedEmotions.removeAt(index);
     });
   }
 
+  /// Submits the selected emotions by navigating to the EmotionUpload screen.
+  ///
+  /// This method passes the list of selected emotion IDs and the ID of today's emotion log as extra data.
   void _submitEmotions() {
     context.go(EmotionUpload.path, extra: {
       'emotionIDs': _selectedEmotions.map((e) => e.id).toList(),
@@ -111,7 +125,7 @@ class _EmotionPickerScreenState extends ConsumerState<EmotionPickerScreen> {
               ),
             ),
           ),
-          if (_selectedEmotions.length >= 3)
+          if (_selectedEmotions.length >= EmotionLog.logSize)
             Positioned(
               top: 0,
               left: 0,
@@ -123,15 +137,16 @@ class _EmotionPickerScreenState extends ConsumerState<EmotionPickerScreen> {
                 ),
               ),
             ),
-          if (_selectedEmotions.length >= 3)
+          if (_selectedEmotions.length >= EmotionLog.logSize)
             Center(
               child: ElevatedButton(
                 onPressed: _submitEmotions,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.greenAccent,
-                  padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+                  backgroundColor: Colors.lime,
+                  padding: const EdgeInsets.symmetric(horizontal: Sizes.p32, vertical: Sizes.p16),
                 ),
-                child: const Text('Submit :)', style: TextStyle(fontSize: 24, color: Colors.black)),
+                child: const Text('Submit :)',
+                    style: TextStyle(fontSize: Sizes.p24, color: Colors.black)),
               ),
             ),
           Positioned(
@@ -141,16 +156,17 @@ class _EmotionPickerScreenState extends ConsumerState<EmotionPickerScreen> {
               children: [
                 for (int index = 0; index < _selectedEmotions.length; index++)
                   Padding(
-                    padding: const EdgeInsets.only(right: 8),
+                    padding: const EdgeInsets.only(right: Sizes.p8),
                     child: Container(
                       width: 50,
                       height: 50,
                       decoration: BoxDecoration(
                         color: _selectedEmotions[index].color,
-                        borderRadius: BorderRadius.circular(25),
+                        borderRadius: BorderRadius.circular(Sizes.p24),
                       ),
                       child: IconButton(
                         icon: const Icon(Icons.close),
+                        tooltip: 'Remove Emotion',
                         color: Colors.white,
                         onPressed: () => _removeEmotion(index),
                       ),
@@ -166,15 +182,19 @@ class _EmotionPickerScreenState extends ConsumerState<EmotionPickerScreen> {
             if (currentEmotion != null && _selectedEmotions.length < 3)
               FloatingActionButton(
                 heroTag: 'addEmotion',
-                backgroundColor: Colors.greenAccent,
+                tooltip: 'Add Emotion',
+                backgroundColor: Colors.lightGreen,
+                foregroundColor: Colors.white,
                 onPressed: () => pushEmotion(currentEmotion!),
                 child: const Icon(Icons.add),
               ),
-            const SizedBox(width: 16),
-            if (_selectedEmotions.isNotEmpty && _selectedEmotions.length < 3)
+            const SizedBox(width: Sizes.p16),
+            if (_selectedEmotions.isNotEmpty && _selectedEmotions.length < EmotionLog.logSize)
               FloatingActionButton(
                 heroTag: 'submitEmotions',
-                backgroundColor: Colors.grey,
+                tooltip: 'Submit Emotions',
+                backgroundColor: Colors.indigo,
+                foregroundColor: Colors.white,
                 onPressed: _submitEmotions,
                 child: const Icon(Icons.arrow_forward),
               ),
@@ -186,9 +206,12 @@ class _EmotionPickerScreenState extends ConsumerState<EmotionPickerScreen> {
         controller: _controllerHorizontal,
         physics: const ClampingScrollPhysics(),
         scrollDirection: Axis.horizontal,
-        itemCount: Category.values.length,
+        itemCount: Category.values.length + 2, // Add extra items for padding
         itemBuilder: (context, categoryIndex) {
-          final category = Category.values[categoryIndex];
+          if (categoryIndex == 0 || categoryIndex == Category.values.length + 1) {
+            return SizedBox(width: MediaQuery.of(context).size.width / 2 - 100); // Add padding
+          }
+          final category = Category.values[categoryIndex - 1];
           final emotions = Emotion.values.where((emotion) => emotion.category == category).toList();
           return SizedBox(
             width: 200,
@@ -197,6 +220,7 @@ class _EmotionPickerScreenState extends ConsumerState<EmotionPickerScreen> {
                 direction: Axis.vertical,
                 children: emotions.map((emotion) {
                   return InkWell(
+                    onLongPress: () => pushEmotion(emotion),
                     onTap: _selectedEmotions.contains(emotion)
                         ? null
                         : () {
@@ -206,9 +230,8 @@ class _EmotionPickerScreenState extends ConsumerState<EmotionPickerScreen> {
                             });
                             _controllerHorizontal.animateTo(
                               _controllerHorizontal.position.minScrollExtent +
-                                  200 * category.index.toDouble() -
-                                  100,
-                              duration: const Duration(milliseconds: 200),
+                                  200 * category.index.toDouble(),
+                              duration: const Duration(milliseconds: 300),
                               curve: Curves.easeInOut,
                             );
                             _verticalControllers[category]!.animateToItem(
@@ -232,12 +255,12 @@ class _EmotionPickerScreenState extends ConsumerState<EmotionPickerScreen> {
                         child: Text(
                           '$emotion',
                           style: TextStyle(
-                            fontSize: 24,
+                            fontSize: Sizes.p24,
                             fontWeight:
                                 currentEmotion == emotion ? FontWeight.bold : FontWeight.normal,
-                            color: currentEmotion == emotion || _selectedEmotions.contains(emotion)
-                                ? Colors.white
-                                : Colors.black,
+                            color: _selectedEmotions.contains(emotion)
+                                ? Colors.black
+                                : emotion.textColor,
                           ),
                         ),
                       ),

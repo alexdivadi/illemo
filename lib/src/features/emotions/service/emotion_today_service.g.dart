@@ -6,7 +6,26 @@ part of 'emotion_today_service.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$uploadEmotionLogHash() => r'8001e2456e91990abd0ac6337854442673c7e8cc';
+String _$emotionTodayServiceHash() =>
+    r'd1f922de4fe5ce0e18ac99c5979a45d74b121cc7';
+
+/// See also [emotionTodayService].
+@ProviderFor(emotionTodayService)
+final emotionTodayServiceProvider =
+    AutoDisposeProvider<EmotionTodayService>.internal(
+  emotionTodayService,
+  name: r'emotionTodayServiceProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$emotionTodayServiceHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+typedef EmotionTodayServiceRef = AutoDisposeProviderRef<EmotionTodayService>;
+String _$uploadEmotionLogHash() => r'1fc7108349f7f60a7238191ac78288e72fd1cf34';
 
 /// Copied from Dart SDK
 class _SystemHash {
@@ -173,23 +192,5 @@ class _UploadEmotionLogProviderElement
   @override
   String? get id => (origin as UploadEmotionLogProvider).id;
 }
-
-String _$emotionTodayServiceHash() =>
-    r'ea48e04a511cf85f186205c9e5cb7ae8f39eb1c7';
-
-/// See also [EmotionTodayService].
-@ProviderFor(EmotionTodayService)
-final emotionTodayServiceProvider =
-    AsyncNotifierProvider<EmotionTodayService, EmotionLog?>.internal(
-  EmotionTodayService.new,
-  name: r'emotionTodayServiceProvider',
-  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-      ? null
-      : _$emotionTodayServiceHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
-
-typedef _$EmotionTodayService = AsyncNotifier<EmotionLog?>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

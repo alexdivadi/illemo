@@ -9,31 +9,30 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'emotion_today_service.g.dart';
 
-@Riverpod(keepAlive: true)
-class EmotionTodayService extends _$EmotionTodayService {
-  late final EmotionRepository _emotionRepository;
+class EmotionTodayService {
+  EmotionTodayService(this.emotionRepository);
 
-  @override
-  Future<EmotionLog?> build() {
-    _emotionRepository = ref.watch(emotionRepositoryProvider);
-    return _emotionRepository.getEmotionLogToday();
-  }
+  final EmotionRepository emotionRepository;
 
   void updateEmotionLogToday(EmotionLogID? id, EmotionLog emotionLog) async {
     if (id == null) {
-      id = await _emotionRepository.addEmotionLog(emotionLog);
+      id = await emotionRepository.addEmotionLog(emotionLog);
     } else {
-      await _emotionRepository.updateEmotionLog(id, emotionLog);
+      await emotionRepository.updateEmotionLog(id, emotionLog);
     }
     log('Updated today\'s emotions: $emotionLog');
-    state = AsyncValue<EmotionLog?>.data(emotionLog.copyWith(id: id));
   }
 
   void deleteEmotionLogToday(EmotionLogID id) async {
-    await _emotionRepository.deleteEmotionLog(id);
+    await emotionRepository.deleteEmotionLog(id);
     log('Deleted today\'s emotions.');
-    state = AsyncValue.data(null);
   }
+}
+
+@riverpod
+EmotionTodayService emotionTodayService(Ref ref) {
+  final EmotionRepository emotionRepository = ref.watch(emotionRepositoryProvider);
+  return EmotionTodayService(emotionRepository);
 }
 
 @riverpod
@@ -44,6 +43,6 @@ Future<void> uploadEmotionLog(Ref ref, List<int> emotionIds, EmotionLogID? id) a
     date: DateTime.now(),
     id: id,
   );
-  final EmotionTodayService emotionTodayService = ref.read(emotionTodayServiceProvider.notifier);
+  final EmotionTodayService emotionTodayService = ref.read(emotionTodayServiceProvider);
   return emotionTodayService.updateEmotionLogToday(id, log);
 }
