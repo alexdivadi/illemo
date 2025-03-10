@@ -28,6 +28,9 @@ class EmotionLog extends Equatable {
   List<Emotion> get emotions =>
       [emotion1, if (emotion2 != null) emotion2!, if (emotion3 != null) emotion3!];
 
+  /// Returns true if the log is complete.
+  bool get isComplete => emotion2 != null && emotion3 != null;
+
   @override
   List<Object?> get props => [emotion1, emotion2, emotion3, date];
 

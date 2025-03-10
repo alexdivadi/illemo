@@ -18,6 +18,7 @@ class CalendarDay extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final today = DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day);
     return LayoutBuilder(builder: (BuildContext context, BoxConstraints constraints) {
       // Minus 2 for border width, minus 6 for padding
       final tileHeight = (constraints.maxHeight - Sizes.p8) / EmotionLog.logSize;
@@ -25,7 +26,26 @@ class CalendarDay extends StatelessWidget {
         margin: const EdgeInsets.all(Sizes.p2),
         decoration: BoxDecoration(
           border: Border.all(
-            color: isComplete ? Colors.amber : Colors.grey,
+            color: () {
+              switch (date.compareTo(today)) {
+                case 0:
+                  return emotionLog != null
+                      ? isComplete
+                          ? Colors.amber
+                          : Colors.grey
+                      : Colors.grey.withAlpha(75);
+                case -1:
+                  return emotionLog != null
+                      ? isComplete
+                          ? Colors.amber
+                          : Colors.grey
+                      : Colors.grey.withAlpha(75);
+                case 1:
+                  return Colors.transparent;
+                default:
+                  return Colors.transparent;
+              }
+            }(),
             width: Sizes.p2,
           ),
           borderRadius: BorderRadius.circular(Sizes.p4),
@@ -56,24 +76,49 @@ class CalendarDay extends StatelessWidget {
               );
             }
           },
-          child: EmotionLogTile(
-            emotionLog: emotionLog,
-            height: tileHeight,
-            child: Padding(
-              padding: const EdgeInsets.all(1.0),
-              child: CircleAvatar(
-                backgroundColor: Colors.white.withValues(alpha: 0.5),
-                radius: 10.0,
-                child: Text(
-                  '${date.day}',
-                  style: const TextStyle(
-                    color: Colors.black,
-                    fontSize: 9.0,
+          child: date.isAfter(today)
+              ? SizedBox(
+                  height: constraints.maxHeight,
+                  child: Stack(
+                    children: [
+                      Container(
+                        color: Colors.white,
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.all(1.0),
+                        child: CircleAvatar(
+                          backgroundColor: Colors.white.withValues(alpha: 0.5),
+                          radius: 10.0,
+                          child: Text(
+                            '${date.day}',
+                            style: TextStyle(
+                              color: Colors.black.withValues(alpha: 0.5),
+                              fontSize: 9.0,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                )
+              : EmotionLogTile(
+                  emotionLog: emotionLog,
+                  height: tileHeight,
+                  child: Padding(
+                    padding: const EdgeInsets.all(1.0),
+                    child: CircleAvatar(
+                      backgroundColor: Colors.white.withValues(alpha: 0.5),
+                      radius: 10.0,
+                      child: Text(
+                        '${date.day}',
+                        style: const TextStyle(
+                          color: Colors.black,
+                          fontSize: 9.0,
+                        ),
+                      ),
+                    ),
                   ),
                 ),
-              ),
-            ),
-          ),
         ),
       );
     });

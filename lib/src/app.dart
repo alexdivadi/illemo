@@ -11,7 +11,8 @@ import 'package:url_launcher/url_launcher.dart';
 class MyApp extends ConsumerWidget {
   const MyApp({super.key});
 
-  static const primaryColor = Colors.indigo;
+  static const primaryColor = Colors.lime;
+  static const onPrimaryColor = Colors.black;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -66,7 +67,7 @@ class MyApp extends ConsumerWidget {
         unselectedWidgetColor: Colors.grey,
         appBarTheme: const AppBarTheme(
           backgroundColor: primaryColor,
-          foregroundColor: Colors.white,
+          foregroundColor: onPrimaryColor,
           elevation: 2.0,
           centerTitle: true,
         ),
@@ -75,13 +76,13 @@ class MyApp extends ConsumerWidget {
         elevatedButtonTheme: ElevatedButtonThemeData(
           style: ElevatedButton.styleFrom(
             backgroundColor: primaryColor,
-            foregroundColor: Colors.white,
+            foregroundColor: onPrimaryColor,
           ),
         ),
         outlinedButtonTheme: OutlinedButtonThemeData(
           style: OutlinedButton.styleFrom(
             backgroundColor: primaryColor,
-            foregroundColor: Colors.white,
+            foregroundColor: onPrimaryColor,
           ),
         ),
         floatingActionButtonTheme: const FloatingActionButtonThemeData(

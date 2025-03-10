@@ -67,7 +67,7 @@ class EmotionCalendar extends StatelessWidget {
     final Map<DateTime, EmotionLog> emotionLogDates = {for (var log in emotionLogs) log.date: log};
 
     // Generate the leading empty days
-    final leadingEmptyDays = List.generate(weekdayOfFirstDay - 1, (index) => Container());
+    final leadingEmptyDays = List.generate(weekdayOfFirstDay, (index) => Container());
 
     // Generate the days of the month
     final days = List.generate(daysInMonth, (index) {
@@ -76,7 +76,7 @@ class EmotionCalendar extends StatelessWidget {
       return CalendarDay(
         date: day,
         emotionLog: emotionLog,
-        isComplete: emotionLog != null && emotionLog.emotions.length == EmotionLog.logSize,
+        isComplete: emotionLog != null && emotionLog.isComplete,
       );
     });
 
