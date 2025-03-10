@@ -34,8 +34,11 @@ class EmotionLogTile extends StatelessWidget {
                         color: emotion.color,
                         child: Center(
                           child: showNames
-                              ? Text('$emotion',
-                                  style: TextStyle(fontSize: Sizes.p24, color: emotion.textColor))
+                              ? FittedBox(
+                                  child: Text('$emotion',
+                                      style:
+                                          TextStyle(fontSize: Sizes.p24, color: emotion.textColor)),
+                                )
                               : null,
                         ),
                       );
