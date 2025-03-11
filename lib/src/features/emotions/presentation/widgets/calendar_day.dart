@@ -19,6 +19,7 @@ class CalendarDay extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final today = DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day);
+    final currentDate = DateTime(date.year, date.month, date.day);
     return LayoutBuilder(builder: (BuildContext context, BoxConstraints constraints) {
       // Minus 2 for border width, minus 6 for padding
       final tileHeight = (constraints.maxHeight - Sizes.p8) / EmotionLog.logSize;
@@ -27,7 +28,7 @@ class CalendarDay extends StatelessWidget {
         decoration: BoxDecoration(
           border: Border.all(
             color: () {
-              switch (date.compareTo(today)) {
+              switch (currentDate.compareTo(today)) {
                 case 0:
                   return emotionLog != null
                       ? isComplete
@@ -57,7 +58,7 @@ class CalendarDay extends StatelessWidget {
                 context: context,
                 builder: (BuildContext context) {
                   return AlertDialog(
-                    title: Text('On ${DateFormat.yMMMMd().format(date)} you felt:'),
+                    title: Text('On ${DateFormat.yMMMMd().format(currentDate)} you felt:'),
                     content: EmotionLogTile(
                       emotionLog: emotionLog,
                       height: 100,
@@ -76,7 +77,7 @@ class CalendarDay extends StatelessWidget {
               );
             }
           },
-          child: date.isAfter(today)
+          child: currentDate.isAfter(today)
               ? SizedBox(
                   height: constraints.maxHeight,
                   child: Stack(
@@ -90,7 +91,7 @@ class CalendarDay extends StatelessWidget {
                           backgroundColor: Colors.white.withValues(alpha: 0.5),
                           radius: 10.0,
                           child: Text(
-                            '${date.day}',
+                            '${currentDate.day}',
                             style: TextStyle(
                               color: Colors.black.withValues(alpha: 0.5),
                               fontSize: 9.0,
@@ -110,7 +111,7 @@ class CalendarDay extends StatelessWidget {
                       backgroundColor: Colors.white.withValues(alpha: 0.5),
                       radius: 10.0,
                       child: Text(
-                        '${date.day}',
+                        '${currentDate.day}',
                         style: const TextStyle(
                           color: Colors.black,
                           fontSize: 9.0,

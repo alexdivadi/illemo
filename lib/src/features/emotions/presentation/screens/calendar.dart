@@ -14,11 +14,10 @@ class CalendarScreen extends ConsumerWidget {
 
   final DateTime? date;
 
-  /// The default date to show the calendar for.
-  static final today = DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day);
-
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    /// The default date to show the calendar for.
+    final today = DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day);
     final currentDate = date ?? today;
     return Scaffold(
       resizeToAvoidBottomInset: false,

@@ -6,7 +6,7 @@ part of 'emotion_calendar.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$emotionCalendarHash() => r'b176fe0b5ff9e172d2e5a47336bdd1d8709689b5';
+String _$emotionCalendarHash() => r'b1f48a784c0804308c460e19e94e8e0eb916009e';
 
 /// Copied from Dart SDK
 class _SystemHash {

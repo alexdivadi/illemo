@@ -66,6 +66,7 @@ class DashboardScreen extends ConsumerWidget {
                                 child: Center(
                                   child: Text(
                                     'Log your emotions!',
+                                    textAlign: TextAlign.center,
                                     style:
                                         const TextStyle(fontSize: Sizes.p24, color: Colors.white),
                                   ),
