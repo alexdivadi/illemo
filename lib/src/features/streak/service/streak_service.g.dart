@@ -59,7 +59,7 @@ final longestStreakProvider = AutoDisposeStreamProvider<Streak?>.internal(
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef LongestStreakRef = AutoDisposeStreamProviderRef<Streak?>;
-String _$incrementStreakHash() => r'423f29559a92c8cd6e371e6ad710656292e3da16';
+String _$incrementStreakHash() => r'4bf2ff28e5cb5dce95bc97b79a0b5c6963ec649c';
 
 /// See also [incrementStreak].
 @ProviderFor(incrementStreak)
