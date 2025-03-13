@@ -48,6 +48,7 @@ unlinked_spec.ds
 .flutter-plugins-dependencies
 
 # Android related
+**/android/app/.cxx/
 **/android/**/gradle-wrapper.jar
 **/android/.gradle
 **/android/captures/
