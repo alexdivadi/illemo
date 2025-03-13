@@ -8,7 +8,9 @@ part of 'streak_service.dart';
 
 String _$streakServiceHash() => r'3bb990fa74e92323b536afa3c12e254b2638be08';
 
-/// See also [streakService].
+/// Provides an instance of [StreakService].
+///
+/// Copied from [streakService].
 @ProviderFor(streakService)
 final streakServiceProvider = AutoDisposeProvider<StreakService>.internal(
   streakService,
@@ -23,10 +25,11 @@ final streakServiceProvider = AutoDisposeProvider<StreakService>.internal(
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef StreakServiceRef = AutoDisposeProviderRef<StreakService>;
-String _$streakHash() => r'517b9f5624a61c7f27cae76aeb18f30de42fde26';
+String _$streakHash() => r'fd03e472ea8a73e9cd7db2453edf89b4de1cdc9c';
 
-/// Provider for [StreakRepository].
-/// Requires [UserID] userID.
+/// Provider for the current [Streak].
+///
+/// It resets the streak if it is broken.
 ///
 /// Copied from [streak].
 @ProviderFor(streak)
@@ -44,7 +47,9 @@ final streakProvider = AutoDisposeFutureProvider<Streak>.internal(
 typedef StreakRef = AutoDisposeFutureProviderRef<Streak>;
 String _$longestStreakHash() => r'2ea6fa5d5acdb6f866bcc649ba05e54785ef4b11';
 
-/// See also [longestStreak].
+/// Provides a stream of the longest [Streak].
+///
+/// Copied from [longestStreak].
 @ProviderFor(longestStreak)
 final longestStreakProvider = AutoDisposeStreamProvider<Streak?>.internal(
   longestStreak,
@@ -61,7 +66,11 @@ final longestStreakProvider = AutoDisposeStreamProvider<Streak?>.internal(
 typedef LongestStreakRef = AutoDisposeStreamProviderRef<Streak?>;
 String _$incrementStreakHash() => r'4bf2ff28e5cb5dce95bc97b79a0b5c6963ec649c';
 
-/// See also [incrementStreak].
+/// Increments the current streak.
+///
+/// It forces the [streakProvider] to refresh after updating the streak.
+///
+/// Copied from [incrementStreak].
 @ProviderFor(incrementStreak)
 final incrementStreakProvider = AutoDisposeFutureProvider<void>.internal(
   incrementStreak,

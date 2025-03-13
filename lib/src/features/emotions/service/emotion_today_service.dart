@@ -5,6 +5,7 @@ import 'package:illemo/src/features/emotions/data/repositories/emotion_repositor
 import 'package:illemo/src/features/emotions/domain/entities/emotion_log.dart';
 import 'package:illemo/src/features/emotions/domain/models/emotion.dart';
 import 'package:illemo/src/features/emotions/domain/models/emotion_log_model.dart';
+import 'package:illemo/src/features/streak/service/streak_service.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'emotion_today_service.g.dart';
@@ -14,7 +15,7 @@ class EmotionTodayService {
 
   final EmotionRepository emotionRepository;
 
-  void updateEmotionLogToday(EmotionLogID? id, EmotionLog emotionLog) async {
+  Future<void> updateEmotionLogToday(EmotionLogID? id, EmotionLog emotionLog) async {
     if (id == null) {
       id = await emotionRepository.addEmotionLog(emotionLog);
     } else {
@@ -35,6 +36,7 @@ EmotionTodayService emotionTodayService(Ref ref) {
   return EmotionTodayService(emotionRepository);
 }
 
+/// Uploads the emotion log to the server and increments the streak.
 @riverpod
 Future<void> uploadEmotionLog(Ref ref, List<int> emotionIds, EmotionLogID? id) async {
   final emotions = emotionIds.map((id) => Emotion.get(id)).toList();
@@ -44,5 +46,6 @@ Future<void> uploadEmotionLog(Ref ref, List<int> emotionIds, EmotionLogID? id) a
     id: id,
   );
   final EmotionTodayService emotionTodayService = ref.read(emotionTodayServiceProvider);
-  return emotionTodayService.updateEmotionLogToday(id, log);
+  await emotionTodayService.updateEmotionLogToday(id, log);
+  return ref.read(incrementStreakProvider);
 }

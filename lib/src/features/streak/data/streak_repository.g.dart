@@ -9,6 +9,7 @@ part of 'streak_repository.dart';
 String _$streakRepositoryHash() => r'ed2af13070badeb7c4d9844f402527e6443af795';
 
 /// Provider for [StreakRepository].
+///
 /// Requires [UserID] userID.
 ///
 /// Copied from [streakRepository].

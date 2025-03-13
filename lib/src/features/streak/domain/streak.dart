@@ -13,6 +13,8 @@ class Streak extends Equatable {
   final DateTime lastUpdated;
   final StreakID? id;
 
+  /// Returns true if the streak is broken,
+  /// i.e. the difference between [lastUpdated] and `DateTime.now()` is more than one calendar day.
   bool get isBroken => DateTime.now().difference(lastUpdated).inDays > 1;
 
   @override
@@ -21,11 +23,33 @@ class Streak extends Equatable {
   @override
   bool get stringify => true;
 
+  /// Returns a new [Streak] with the count incremented by 1.
   Streak increment() {
     return Streak(
       count: count + 1,
       lastUpdated: DateTime.now(),
       id: id,
+    );
+  }
+
+  /// Returns a new [Streak] with the count reset to 0.
+  Streak reset() {
+    return Streak(
+      count: 0,
+      lastUpdated: DateTime.now(),
+      id: id,
+    );
+  }
+
+  Streak copyWith({
+    int? count,
+    DateTime? lastUpdated,
+    StreakID? id,
+  }) {
+    return Streak(
+      count: count ?? this.count,
+      lastUpdated: lastUpdated ?? this.lastUpdated,
+      id: id ?? this.id,
     );
   }
 }

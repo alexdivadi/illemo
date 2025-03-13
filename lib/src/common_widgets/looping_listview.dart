@@ -30,6 +30,14 @@ class LoopingListView extends StatelessWidget {
 }
 
 extension LoopingListScrollController on ScrollController {
+  /// Animate to the given index in a looping list.
+  ///  - [index] is the index to scroll to.
+  ///  - [itemExtent] is the height of each item in the list.
+  ///  - [itemCount] is the number of items in the list.
+  ///  - [duration] is the duration of the animation.
+  ///  - [curve] is the curve of the animation.
+  ///
+  /// Uses an algorithm to determine the shortest path to the target index.
   void animateToItem(int index,
       {required double itemExtent,
       required int itemCount,
