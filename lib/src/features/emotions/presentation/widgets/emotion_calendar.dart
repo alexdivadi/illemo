@@ -64,15 +64,18 @@ class EmotionCalendar extends StatelessWidget {
     final weekdayOfFirstDay = firstDayOfMonth.weekday;
 
     // Create a set of dates with emotion logs for efficient lookup
-    final Map<DateTime, EmotionLog> emotionLogDates = {for (var log in emotionLogs) log.date: log};
+    // Have to truncate the time part of the date because 1 hour keeps getting randomly added
+    final Map<String, EmotionLog> emotionLogDates = {
+      for (var log in emotionLogs) log.date.toIso8601String().split('T').first: log
+    };
 
     // Generate the leading empty days
     final leadingEmptyDays = List.generate(weekdayOfFirstDay, (index) => Container());
 
     // Generate the days of the month
     final days = List.generate(daysInMonth, (index) {
-      final day = firstDayOfMonth.add(Duration(days: index));
-      final emotionLog = emotionLogDates[day];
+      final day = firstDayOfMonth.add(Duration(days: index, hours: 0));
+      final emotionLog = emotionLogDates[day.toIso8601String().split('T').first];
       return CalendarDay(
         date: day,
         emotionLog: emotionLog,

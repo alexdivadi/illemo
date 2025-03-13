@@ -25,7 +25,7 @@ final emotionTodayServiceProvider =
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef EmotionTodayServiceRef = AutoDisposeProviderRef<EmotionTodayService>;
-String _$uploadEmotionLogHash() => r'1fc7108349f7f60a7238191ac78288e72fd1cf34';
+String _$uploadEmotionLogHash() => r'cbb2b2b74746a72682eda2358c00bc10d8304834';
 
 /// Copied from Dart SDK
 class _SystemHash {
@@ -48,16 +48,24 @@ class _SystemHash {
   }
 }
 
-/// See also [uploadEmotionLog].
+/// Uploads the emotion log to the server and increments the streak.
+///
+/// Copied from [uploadEmotionLog].
 @ProviderFor(uploadEmotionLog)
 const uploadEmotionLogProvider = UploadEmotionLogFamily();
 
-/// See also [uploadEmotionLog].
+/// Uploads the emotion log to the server and increments the streak.
+///
+/// Copied from [uploadEmotionLog].
 class UploadEmotionLogFamily extends Family<AsyncValue<void>> {
-  /// See also [uploadEmotionLog].
+  /// Uploads the emotion log to the server and increments the streak.
+  ///
+  /// Copied from [uploadEmotionLog].
   const UploadEmotionLogFamily();
 
-  /// See also [uploadEmotionLog].
+  /// Uploads the emotion log to the server and increments the streak.
+  ///
+  /// Copied from [uploadEmotionLog].
   UploadEmotionLogProvider call(
     List<int> emotionIds,
     String? id,
@@ -93,9 +101,13 @@ class UploadEmotionLogFamily extends Family<AsyncValue<void>> {
   String? get name => r'uploadEmotionLogProvider';
 }
 
-/// See also [uploadEmotionLog].
+/// Uploads the emotion log to the server and increments the streak.
+///
+/// Copied from [uploadEmotionLog].
 class UploadEmotionLogProvider extends AutoDisposeFutureProvider<void> {
-  /// See also [uploadEmotionLog].
+  /// Uploads the emotion log to the server and increments the streak.
+  ///
+  /// Copied from [uploadEmotionLog].
   UploadEmotionLogProvider(
     List<int> emotionIds,
     String? id,

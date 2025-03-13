@@ -5,6 +5,8 @@ import 'package:illemo/src/constants/app_sizes.dart';
 import 'package:illemo/src/features/emotions/data/providers/emotion_today.dart';
 import 'package:illemo/src/features/emotions/presentation/screens/emotion_picker.dart';
 import 'package:illemo/src/features/emotions/presentation/widgets/emotion_log_tile.dart';
+import 'package:illemo/src/features/streak/presentation/streak_widget.dart';
+import 'package:illemo/src/features/streak/service/streak_service.dart';
 import 'package:intl/intl.dart';
 
 class DashboardScreen extends ConsumerWidget {
@@ -16,6 +18,7 @@ class DashboardScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final todaysEmotionLog = ref.watch(emotionTodayProvider);
+    final streak = ref.watch(streakProvider);
     return Scaffold(
       appBar: AppBar(
         title: Text(DateFormat.yMMMMEEEEd().format(DateTime.now())),
@@ -66,6 +69,7 @@ class DashboardScreen extends ConsumerWidget {
                                 child: Center(
                                   child: Text(
                                     'Log your emotions!',
+                                    textAlign: TextAlign.center,
                                     style:
                                         const TextStyle(fontSize: Sizes.p24, color: Colors.white),
                                   ),
@@ -82,6 +86,10 @@ class DashboardScreen extends ConsumerWidget {
                   width: 300,
                   fit: BoxFit.cover,
                 ),
+                gapH64,
+                streak.isLoading
+                    ? const CircularProgressIndicator.adaptive()
+                    : StreakWidget(streak.requireValue),
               ],
             ),
           ),
