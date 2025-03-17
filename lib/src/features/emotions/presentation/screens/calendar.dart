@@ -5,6 +5,7 @@ import 'package:illemo/src/constants/app_sizes.dart';
 import 'package:illemo/src/features/emotions/data/providers/emotion_calendar.dart';
 import 'package:illemo/src/features/emotions/presentation/widgets/emotion_calendar.dart';
 import 'package:illemo/src/routing/app_router.dart';
+import 'package:illemo/src/utils/date.dart';
 
 class CalendarScreen extends ConsumerWidget {
   const CalendarScreen({super.key, this.date});
@@ -36,7 +37,7 @@ class CalendarScreen extends ConsumerWidget {
               if (selectedDate != null) {
                 if (context.mounted) {
                   context.pushReplacementNamed(AppRoute.calendarDate.name,
-                      pathParameters: {'date': selectedDate.toIso8601String().split('T').first});
+                      pathParameters: {'date': selectedDate.date});
                 }
               }
             },

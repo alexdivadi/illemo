@@ -30,11 +30,9 @@ class EmotionUpload extends ConsumerWidget {
     );
   }
 
-  Widget _buildLoading() {
-    return const Center(
-      child: CircularProgressIndicator.adaptive(),
-    );
-  }
+  Widget _buildLoading() => const Center(
+        child: CircularProgressIndicator.adaptive(),
+      );
 
   Widget _buildSuccess({required onPressed}) {
     return Center(

@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:illemo/src/features/emotions/domain/entities/emotion_log.dart';
 import 'package:illemo/src/features/emotions/domain/models/emotion.dart';
+import 'package:illemo/src/utils/date.dart';
 import 'package:uuid/uuid.dart';
 
 typedef EmotionLogID = String;
@@ -36,7 +37,7 @@ class EmotionLogModel {
       emotion1: entity.emotion1.id,
       emotion2: entity.emotion2?.id,
       emotion3: entity.emotion3?.id,
-      date: entity.date.toIso8601String().split('T').first,
+      date: entity.date.date,
       timestamp: timestamp ?? DateTime.now().millisecondsSinceEpoch,
     );
   }

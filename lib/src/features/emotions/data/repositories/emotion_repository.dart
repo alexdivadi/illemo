@@ -7,6 +7,7 @@ import 'package:illemo/src/features/authentication/domain/app_user.dart';
 import 'package:illemo/src/features/emotions/data/repositories/emotion_repository_local.dart';
 import 'package:illemo/src/features/emotions/domain/entities/emotion_log.dart';
 import 'package:illemo/src/features/emotions/domain/models/emotion_log_model.dart';
+import 'package:illemo/src/utils/date.dart';
 import 'package:illemo/src/utils/shared_preferences_provider.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -86,7 +87,7 @@ class EmotionRepository {
   Stream<EmotionLog?> getEmotionLogToday() {
     return _firestore
         .collection(emotionsPath(userID))
-        .where('date', isEqualTo: DateTime.now().toIso8601String().split('T').first)
+        .where('date', isEqualTo: DateTime.now().date)
         .limit(1)
         .snapshots()
         .map((querySnapshot) {
@@ -108,12 +109,11 @@ class EmotionRepository {
     Query query = _firestore.collection(emotionsPath(userID));
 
     if (startDate != null) {
-      query =
-          query.where('date', isGreaterThanOrEqualTo: startDate.toIso8601String().split('T').first);
+      query = query.where('date', isGreaterThanOrEqualTo: startDate.date);
     }
 
     if (endDate != null) {
-      query = query.where('date', isLessThanOrEqualTo: endDate.toIso8601String().split('T').first);
+      query = query.where('date', isLessThanOrEqualTo: endDate.date);
     }
     return query.snapshots().map((snapshot) {
       return snapshot.docs
