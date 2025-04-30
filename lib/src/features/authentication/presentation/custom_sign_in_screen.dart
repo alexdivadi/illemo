@@ -18,7 +18,6 @@ class CustomSignInScreen extends ConsumerWidget {
       ),
       body: SignInScreen(
         providers: authProviders,
-        footerBuilder: (context, action) => const SignInAnonymouslyFooter(),
       ),
     );
   }
