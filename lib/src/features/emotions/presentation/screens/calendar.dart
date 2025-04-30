@@ -3,9 +3,13 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:illemo/src/constants/app_sizes.dart';
 import 'package:illemo/src/features/emotions/data/providers/emotion_calendar.dart';
+import 'package:illemo/src/features/emotions/data/providers/emotion_stats.dart';
+import 'package:illemo/src/features/emotions/domain/entities/emotion_log.dart';
 import 'package:illemo/src/features/emotions/presentation/widgets/emotion_calendar.dart';
+import 'package:illemo/src/features/emotions/presentation/widgets/emotion_log_tile.dart';
 import 'package:illemo/src/routing/app_router.dart';
 import 'package:illemo/src/utils/date.dart';
+import 'package:illemo/src/utils/pluralize.dart';
 
 class CalendarScreen extends ConsumerWidget {
   const CalendarScreen({super.key, this.date});
@@ -49,8 +53,15 @@ class CalendarScreen extends ConsumerWidget {
         controller: PageController(
             initialPage: (today.year - currentDate.year) * 12 + today.month - currentDate.month),
         itemBuilder: (BuildContext context, int index) {
-          final targetDate = DateTime(today.year, today.month - index, today.day);
+          final targetDate = DateTime(
+            today.year,
+            today.month - index,
+          );
           final emotionLogs = ref.watch(emotionCalendarProvider(targetDate));
+          final topEmotions = ref.watch(getTopEmotionsProvider(
+            targetDate.startOfMonth,
+            targetDate.endOfMonth,
+          ));
           return Center(
             child: emotionLogs.when(
               data: (emotionLogs) {
@@ -59,73 +70,139 @@ class CalendarScreen extends ConsumerWidget {
                 final totalDays = DateUtils.getDaysInMonth(targetDate.year, targetDate.month);
                 return Column(
                   children: [
-                    Expanded(
+                    Flexible(
+                      flex: 2,
                       child: Padding(
                         padding: const EdgeInsets.all(Sizes.p8),
                         child: EmotionCalendar(emotionLogs: emotionLogs, currentDate: targetDate),
                       ),
                     ),
-                    gapH12,
-                    Padding(
-                      padding: const EdgeInsets.all(Sizes.p16),
-                      child: RichText(
-                        text: TextSpan(
-                          style: const TextStyle(color: Colors.black54),
+                    Flexible(
+                      child: Padding(
+                        padding: EdgeInsets.symmetric(horizontal: Sizes.p16, vertical: Sizes.p8),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceAround,
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: [
-                            TextSpan(
-                                text: '${(numTotal / totalDays * 100).round()}%',
-                                style: const TextStyle(
-                                  fontSize: Sizes.p32,
-                                )),
-                            const TextSpan(
-                              text: ' logged',
+                            Flexible(
+                              flex: 1,
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Text(
+                                    'Top Emotions',
+                                    style: Theme.of(context).textTheme.titleLarge,
+                                  ),
+                                  gapH4,
+                                  topEmotions.when(
+                                      data: (data) {
+                                        if (data.isEmpty) {
+                                          return const Text('No emotions logged');
+                                        }
+                                        return Container(
+                                          height: 150,
+                                          width: double.infinity,
+                                          clipBehavior: Clip.hardEdge,
+                                          decoration: BoxDecoration(
+                                            borderRadius: BorderRadius.circular(Sizes.p16),
+                                          ),
+                                          child: EmotionLogTile(
+                                            emotionLog: EmotionLog.fromEmotions(
+                                              emotions: data,
+                                              date: targetDate,
+                                            ),
+                                            height: 50,
+                                            showNames: true,
+                                          ),
+                                        );
+                                      },
+                                      error: (e, st) => const Text('Error loading top emotions'),
+                                      loading: () => const CircularProgressIndicator.adaptive()),
+                                ],
+                              ),
+                            ),
+                            Flexible(
+                              flex: 1,
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Padding(
+                                    padding: const EdgeInsets.all(Sizes.p8),
+                                    child: RichText(
+                                      text: TextSpan(
+                                        style: const TextStyle(color: Colors.black54),
+                                        children: [
+                                          TextSpan(
+                                              text: '${(numTotal / totalDays * 100).round()}%',
+                                              style: const TextStyle(
+                                                fontSize: Sizes.p32,
+                                              )),
+                                          const TextSpan(
+                                            text: ' logged',
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: Sizes.p16, vertical: Sizes.p4),
+                                    child: Row(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: [
+                                        const Icon(Icons.emoji_events, color: Colors.grey),
+                                        gapW4,
+                                        RichText(
+                                          text: TextSpan(
+                                            children: [
+                                              TextSpan(
+                                                text: '$numTotal',
+                                                style: const TextStyle(
+                                                    fontSize: 24, color: Colors.grey),
+                                              ),
+                                              TextSpan(
+                                                text: ' ${"day".pluralize(numTotal)} logged',
+                                                style: TextStyle(color: Colors.grey),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: Sizes.p16, vertical: Sizes.p4),
+                                    child: Row(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: [
+                                        const Icon(Icons.emoji_events, color: Colors.amber),
+                                        gapW4,
+                                        RichText(
+                                          text: TextSpan(
+                                            children: [
+                                              TextSpan(
+                                                text: '$numGold',
+                                                style: const TextStyle(
+                                                    fontSize: 24, color: Colors.amber),
+                                              ),
+                                              const TextSpan(
+                                                text: ' complete',
+                                                style: TextStyle(color: Colors.amber),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
                           ],
                         ),
                       ),
                     ),
-                    Padding(
-                      padding: const EdgeInsets.all(Sizes.p16),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          const Icon(Icons.emoji_events, color: Colors.grey),
-                          gapW4,
-                          RichText(
-                            text: TextSpan(
-                              children: [
-                                TextSpan(
-                                  text: '$numTotal',
-                                  style: const TextStyle(fontSize: 24, color: Colors.grey),
-                                ),
-                                const TextSpan(
-                                  text: ' days logged',
-                                  style: TextStyle(color: Colors.grey),
-                                ),
-                              ],
-                            ),
-                          ),
-                          gapW16,
-                          const Icon(Icons.emoji_events, color: Colors.amber),
-                          gapW4,
-                          RichText(
-                            text: TextSpan(
-                              children: [
-                                TextSpan(
-                                  text: '$numGold',
-                                  style: const TextStyle(fontSize: 24, color: Colors.amber),
-                                ),
-                                const TextSpan(
-                                  text: ' complete',
-                                  style: TextStyle(color: Colors.amber),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    gapH64,
                   ],
                 );
               },
