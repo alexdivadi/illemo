@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -55,8 +54,10 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
           IconButton(
             icon: const Icon(Icons.calendar_today),
             onPressed: () async {
+              // TODO: This stupid date picker makes the keyboard pop up constantly
               final selectedDate = await showDatePicker(
                 context: context,
+                keyboardType: TextInputType.datetime,
                 initialDate: currentDate,
                 firstDate: DateTime(currentDate.year - 1),
                 lastDate: today,
