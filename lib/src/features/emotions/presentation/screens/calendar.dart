@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -11,7 +12,7 @@ import 'package:illemo/src/routing/app_router.dart';
 import 'package:illemo/src/utils/date.dart';
 import 'package:illemo/src/utils/pluralize.dart';
 
-class CalendarScreen extends ConsumerWidget {
+class CalendarScreen extends ConsumerStatefulWidget {
   const CalendarScreen({super.key, this.date});
 
   static const path = "/calendar";
@@ -20,14 +21,36 @@ class CalendarScreen extends ConsumerWidget {
   final DateTime? date;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<CalendarScreen> createState() => _CalendarScreenState();
+}
+
+class _CalendarScreenState extends ConsumerState<CalendarScreen> {
+  late final PageController _pageController;
+  final today = DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day);
+
+  @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    final currentDate = widget.date ?? today;
+    _pageController = PageController(
+      initialPage: (today.year - currentDate.year) * 12 + today.month - currentDate.month,
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
     /// The default date to show the calendar for.
-    final today = DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day);
-    final currentDate = date ?? today;
+    final currentDate = widget.date ?? today;
     return Scaffold(
       resizeToAvoidBottomInset: false,
       appBar: AppBar(
-        title: const Text(title),
+        title: const Text(CalendarScreen.title),
         actions: [
           IconButton(
             icon: const Icon(Icons.calendar_today),
@@ -50,8 +73,7 @@ class CalendarScreen extends ConsumerWidget {
       ),
       body: PageView.builder(
         reverse: true,
-        controller: PageController(
-            initialPage: (today.year - currentDate.year) * 12 + today.month - currentDate.month),
+        controller: _pageController,
         itemBuilder: (BuildContext context, int index) {
           final targetDate = DateTime(
             today.year,
