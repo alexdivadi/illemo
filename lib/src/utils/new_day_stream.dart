@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'package:riverpod/riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'new_day_stream.g.dart';

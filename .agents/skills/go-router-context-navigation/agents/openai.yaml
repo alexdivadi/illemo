@@ -1,0 +1,4 @@
+interface:
+  display_name: "GoRouter Context Navigation"
+  short_description: "Choose and apply GoRouter context navigation methods"
+  default_prompt: "Use $go-router-context-navigation to implement this Flutter navigation flow with the correct context.go, context.push, context.pop, or replacement method."

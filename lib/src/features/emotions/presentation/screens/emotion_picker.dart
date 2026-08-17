@@ -1,21 +1,22 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:illemo/src/common_widgets/looping_listview.dart';
-import 'package:illemo/src/constants/app_sizes.dart';
+import 'package:illemo/src/features/emotions/domain/entities/emotion_entry.dart';
 import 'package:illemo/src/features/emotions/domain/entities/emotion_log.dart';
-import 'package:illemo/src/features/emotions/domain/models/category.dart';
-import 'package:illemo/src/features/emotions/domain/models/emotion.dart';
-import 'package:illemo/src/features/emotions/presentation/screens/emotion_upload.dart';
+import 'package:illemo/src/features/emotions/domain/models/emotion_definition.dart';
+import 'package:illemo/src/features/emotions/presentation/screens/emotion_confirmation.dart';
+import 'package:illemo/src/features/emotions/presentation/widgets/emotion_glyph.dart';
+import 'package:illemo/src/features/emotions/service/emotion_entry_service.dart';
+import 'package:uuid/uuid.dart';
+
+enum _PickerStep { core, specific, deep }
 
 class EmotionPickerScreen extends ConsumerStatefulWidget {
-  const EmotionPickerScreen({super.key, this.todaysEmotionLog});
+  const EmotionPickerScreen({super.key, this.entry, this.todaysEmotionLog});
 
-  static const path = "/emotion/pick";
-  static const title = "Pick an Emotion";
-
+  static const path = '/emotion/pick';
+  static const title = 'Daily Reflection';
+  final EmotionEntry? entry;
   final EmotionLog? todaysEmotionLog;
 
   @override
@@ -23,260 +24,274 @@ class EmotionPickerScreen extends ConsumerStatefulWidget {
 }
 
 class _EmotionPickerScreenState extends ConsumerState<EmotionPickerScreen> {
-  late ScrollController _controllerHorizontal;
-  final Map<Category, ScrollController> _verticalControllers = {};
-  final List<Emotion> _selectedEmotions = <Emotion>[];
-  Emotion? currentEmotion;
+  _PickerStep _step = _PickerStep.core;
+  EmotionDefinition? _core;
+  EmotionDefinition? _specific;
+  bool _saving = false;
 
-  @override
-  void initState() {
-    super.initState();
-    if (widget.todaysEmotionLog != null) {
-      _selectedEmotions.add(widget.todaysEmotionLog!.emotion1);
-      if (widget.todaysEmotionLog!.emotion2 != null) {
-        _selectedEmotions.add(widget.todaysEmotionLog!.emotion2!);
-      }
-      if (widget.todaysEmotionLog!.emotion3 != null) {
-        _selectedEmotions.add(widget.todaysEmotionLog!.emotion3!);
-      }
-      currentEmotion = widget.todaysEmotionLog!.emotion1;
-    }
-    _controllerHorizontal = ScrollController();
-    for (var category in Category.values) {
-      _verticalControllers[category] = ScrollController();
-    }
-  }
-
-  /// Adds the given [emotion] to the list of selected emotions if the list size is less than the maximum log size.
-  ///
-  /// This method updates the state to include the new emotion and sets the current emotion to null.
-  ///
-  /// [emotion] - The emotion to be added.
-  void pushEmotion(Emotion emotion) {
-    if (_selectedEmotions.length < EmotionLog.logSize && !_selectedEmotions.contains(emotion)) {
-      setState(() {
-        _selectedEmotions.add(emotion);
-        currentEmotion = null;
+  void _selectCore(EmotionDefinition emotion) => setState(() {
+        _core = emotion;
+        _specific = null;
+        _step = _PickerStep.specific;
       });
+
+  void _selectSpecific(EmotionDefinition emotion) => setState(() {
+        _specific = emotion;
+        _step = _PickerStep.deep;
+      });
+
+  void _back() {
+    if (_step == _PickerStep.core) {
+      context.pop();
+      return;
     }
-  }
-
-  /// Removes the emotion at the given [index] from the list of selected emotions.
-  ///
-  /// This method updates the state to remove the emotion and sets the current emotion to the removed emotion.
-  ///
-  /// [index] - The index of the emotion to be removed.
-  void _removeEmotion(int index) {
     setState(() {
-      currentEmotion = _selectedEmotions.removeAt(index);
+      _step = _step == _PickerStep.deep ? _PickerStep.specific : _PickerStep.core;
+      if (_step == _PickerStep.core) _core = null;
     });
   }
 
-  /// Submits the selected emotions by navigating to the EmotionUpload screen.
-  ///
-  /// This method passes the list of selected emotion IDs and the ID of today's emotion log as extra data.
-  void _submitEmotions() {
-    context.go(EmotionUpload.path, extra: {
-      'emotionIDs': _selectedEmotions.map((e) => e.id).toList(),
-      'id': widget.todaysEmotionLog?.id,
-    });
+  Future<void> _save([EmotionDefinition? deep]) async {
+    if (_saving || _core == null || _specific == null) return;
+    setState(() => _saving = true);
+    final entry = EmotionEntry(
+      id: widget.entry?.id ?? const Uuid().v4(),
+      coreId: _core!.id,
+      specificId: _specific!.id,
+      deepId: deep?.id,
+      loggedAt: widget.entry?.loggedAt ?? DateTime.now(),
+    );
+    try {
+      await ref.read(emotionEntryServiceProvider).save(entry);
+      if (mounted) context.go(EmotionConfirmationScreen.path, extra: entry);
+    } on Object catch (error) {
+      if (!mounted) return;
+      setState(() => _saving = false);
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('$error')));
+    }
   }
 
   @override
   Widget build(BuildContext context) {
+    final surface = Theme.of(context).scaffoldBackgroundColor;
     return Scaffold(
-        backgroundColor: Colors.black,
-        appBar: AppBar(
-          title: const Text(EmotionPickerScreen.title),
+      backgroundColor: _core?.core.flood(surface) ?? surface,
+      body: SafeArea(
+        child: Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 560),
+            child: AnimatedSwitcher(
+              duration: const Duration(milliseconds: 180),
+              child: switch (_step) {
+                _PickerStep.core => _CorePicker(onBack: _back, onSelected: _selectCore),
+                _PickerStep.specific =>
+                  _SpecificPicker(core: _core!, onBack: _back, onSelected: _selectSpecific),
+                _PickerStep.deep => _DeepPicker(
+                    core: _core!,
+                    specific: _specific!,
+                    saving: _saving,
+                    onBack: _back,
+                    onSave: _save),
+              },
+            ),
+          ),
         ),
-        body: Stack(children: [
-          _buildEmotionWheels(),
-          Positioned(
-            top: 0,
-            left: 0,
-            right: 0,
-            child: IgnorePointer(
-              child: Container(
-                height: 200,
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                    colors: [Colors.black.withValues(alpha: 0.85), Colors.transparent],
-                  ),
-                ),
-              ),
-            ),
+      ),
+    );
+  }
+}
+
+class _CorePicker extends StatelessWidget {
+  const _CorePicker({required this.onBack, required this.onSelected});
+
+  final VoidCallback onBack;
+  final ValueChanged<EmotionDefinition> onSelected;
+
+  @override
+  Widget build(BuildContext context) => Column(
+        key: const ValueKey('core'),
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(24, 24, 24, 18),
+            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              TextButton.icon(
+                  onPressed: onBack, icon: const Icon(Icons.arrow_back), label: const Text('Back')),
+              const SizedBox(height: 10),
+              Text('What are you feeling right now?',
+                  style: Theme.of(context).textTheme.headlineMedium),
+              const SizedBox(height: 4),
+              Text('Start broad.', style: Theme.of(context).textTheme.bodyLarge),
+            ]),
           ),
-          Positioned(
-            bottom: 0,
-            left: 0,
-            right: 0,
-            child: IgnorePointer(
-              child: Container(
-                height: 200,
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.bottomCenter,
-                    end: Alignment.topCenter,
-                    colors: [Colors.black.withValues(alpha: 0.85), Colors.transparent],
-                  ),
-                ),
-              ),
-            ),
-          ),
-          if (_selectedEmotions.length >= EmotionLog.logSize)
-            Positioned(
-              top: 0,
-              left: 0,
-              right: 0,
-              bottom: 0,
-              child: Center(
-                child: Container(
-                  color: Colors.black.withValues(alpha: (0.5)),
-                ),
-              ),
-            ),
-          if (_selectedEmotions.length >= EmotionLog.logSize)
-            Center(
-              child: ElevatedButton(
-                onPressed: _submitEmotions,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.lime,
-                  padding: const EdgeInsets.symmetric(horizontal: Sizes.p32, vertical: Sizes.p16),
-                ),
-                child: const Text('Submit :)',
-                    style: TextStyle(fontSize: Sizes.p24, color: Colors.black)),
-              ),
-            ),
-          Positioned(
-            top: 16,
-            left: 16,
-            child: Row(
+          Expanded(
+            child: Column(
               children: [
-                for (int index = 0; index < _selectedEmotions.length; index++)
-                  Padding(
-                    padding: const EdgeInsets.only(right: Sizes.p8),
-                    child: Container(
-                      width: 50,
-                      height: 50,
-                      decoration: BoxDecoration(
-                        color: _selectedEmotions[index].color,
-                        borderRadius: BorderRadius.circular(Sizes.p24),
-                      ),
-                      child: IconButton(
-                        icon: const Icon(Icons.close),
-                        tooltip: 'Remove Emotion',
-                        color: Colors.white,
-                        onPressed: () => _removeEmotion(index),
+                for (final emotion in EmotionDefinition.cores)
+                  Expanded(
+                    child: Semantics(
+                      button: true,
+                      label: emotion.label,
+                      child: Material(
+                        color: emotion.core.card,
+                        child: InkWell(
+                          onTap: () => onSelected(emotion),
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 28),
+                            child:
+                                Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+                              Text(emotion.label,
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .headlineSmall
+                                      ?.copyWith(color: emotion.core.foreground)),
+                              EmotionGlyph(emotion: emotion.core, size: 44),
+                            ]),
+                          ),
+                        ),
                       ),
                     ),
                   ),
               ],
             ),
           ),
-        ]),
-        floatingActionButton: Row(
-          mainAxisAlignment: MainAxisAlignment.end,
-          children: [
-            if (currentEmotion != null && _selectedEmotions.length < 3)
-              FloatingActionButton(
-                heroTag: 'addEmotion',
-                tooltip: 'Add Emotion',
-                backgroundColor: Colors.lightGreen,
-                foregroundColor: Colors.white,
-                onPressed: () => pushEmotion(currentEmotion!),
-                child: const Icon(Icons.add),
-              ),
-            const SizedBox(width: Sizes.p16),
-            if (_selectedEmotions.isNotEmpty && _selectedEmotions.length < EmotionLog.logSize)
-              FloatingActionButton(
-                heroTag: 'submitEmotions',
-                tooltip: 'Submit Emotions',
-                backgroundColor: Colors.indigo,
-                foregroundColor: Colors.white,
-                onPressed: _submitEmotions,
-                child: const Icon(Icons.arrow_forward),
-              ),
-          ],
-        ));
-  }
-
-  Widget _buildEmotionWheels() => ListView.builder(
-        controller: _controllerHorizontal,
-        physics: const ClampingScrollPhysics(),
-        scrollDirection: Axis.horizontal,
-        itemCount: Category.values.length + 2, // Add extra items for padding
-        itemBuilder: (context, categoryIndex) {
-          if (categoryIndex == 0 || categoryIndex == Category.values.length + 1) {
-            return SizedBox(width: MediaQuery.of(context).size.width / 2 - 100); // Add padding
-          }
-          final category = Category.values[categoryIndex - 1];
-          final emotions = Emotion.values.where((emotion) => emotion.category == category).toList();
-          return SizedBox(
-            width: 200,
-            child: LoopingListView(
-                controller: _verticalControllers[category],
-                direction: Axis.vertical,
-                children: emotions.map((emotion) {
-                  return InkWell(
-                    onLongPress: () => pushEmotion(emotion),
-                    onTap: _selectedEmotions.contains(emotion)
-                        ? null
-                        : () {
-                            log('Selected emotion: $emotion');
-                            setState(() {
-                              currentEmotion = emotion;
-                            });
-                            _controllerHorizontal.animateTo(
-                              _controllerHorizontal.position.minScrollExtent +
-                                  200 * category.index.toDouble(),
-                              duration: const Duration(milliseconds: 300),
-                              curve: Curves.easeInOut,
-                            );
-                            _verticalControllers[category]!.animateToItem(
-                              emotions.indexOf(emotion),
-                              itemExtent: 200,
-                              itemCount: emotions.length,
-                              duration: const Duration(milliseconds: 500),
-                              curve: Curves.easeInOut,
-                            );
-                          },
-                    child: Container(
-                      width: 200,
-                      height: 200,
-                      decoration: BoxDecoration(
-                        color: _selectedEmotions.contains(emotion) ? Colors.grey : emotion.color,
-                        border: currentEmotion == emotion
-                            ? Border.all(color: Colors.white, width: 3)
-                            : null,
-                      ),
-                      child: Center(
-                        child: Text(
-                          '$emotion',
-                          style: TextStyle(
-                            fontSize: Sizes.p24,
-                            fontWeight:
-                                currentEmotion == emotion ? FontWeight.bold : FontWeight.normal,
-                            color: _selectedEmotions.contains(emotion)
-                                ? Colors.black
-                                : emotion.textColor,
-                          ),
-                        ),
-                      ),
-                    ),
-                  );
-                }).toList()),
-          );
-        },
+          const Padding(
+            padding: EdgeInsets.all(18),
+            child: Text('No feeling is good or bad — they’re all welcome here.',
+                textAlign: TextAlign.center),
+          ),
+        ],
       );
+}
+
+class _SpecificPicker extends StatelessWidget {
+  const _SpecificPicker({required this.core, required this.onBack, required this.onSelected});
+
+  final EmotionDefinition core;
+  final VoidCallback onBack;
+  final ValueChanged<EmotionDefinition> onSelected;
 
   @override
-  void dispose() {
-    _controllerHorizontal.dispose();
-    for (var controller in _verticalControllers.values) {
-      controller.dispose();
-    }
-    super.dispose();
+  Widget build(BuildContext context) {
+    final feelings = EmotionDefinition.childrenOf(core.id);
+    final theme = Theme.of(context);
+    final background = core.core.flood(theme.scaffoldBackgroundColor);
+    final foreground = core.core.foregroundOn(background);
+    return Padding(
+      key: const ValueKey('specific'),
+      padding: const EdgeInsets.fromLTRB(20, 24, 20, 32),
+      child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+        Align(
+            alignment: Alignment.centerLeft,
+            child: TextButton.icon(
+                onPressed: onBack, icon: const Icon(Icons.arrow_back), label: const Text('Back'))),
+        Row(children: [
+          EmotionGlyph(emotion: core.core, size: 40),
+          const SizedBox(width: 14),
+          Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Text(core.label.toUpperCase(),
+                style: theme.textTheme.labelSmall?.copyWith(color: foreground)),
+            Text('More specifically…',
+                style: Theme.of(context).textTheme.headlineSmall?.copyWith(color: foreground)),
+          ]),
+        ]),
+        const SizedBox(height: 24),
+        Expanded(
+          child: GridView.builder(
+            itemCount: feelings.length,
+            gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
+                maxCrossAxisExtent: 250,
+                childAspectRatio: 1.55,
+                crossAxisSpacing: 10,
+                mainAxisSpacing: 10),
+            itemBuilder: (context, index) {
+              final feeling = feelings[index];
+              return OutlinedButton(
+                style: OutlinedButton.styleFrom(
+                    backgroundColor: core.core.soft(theme.colorScheme.surface),
+                    foregroundColor: foreground,
+                    side: BorderSide(color: core.core.border)),
+                onPressed: () => onSelected(feeling),
+                child: Text(feeling.label,
+                    style: Theme.of(context).textTheme.titleMedium?.copyWith(color: foreground)),
+              );
+            },
+          ),
+        ),
+      ]),
+    );
+  }
+}
+
+class _DeepPicker extends StatelessWidget {
+  const _DeepPicker(
+      {required this.core,
+      required this.specific,
+      required this.saving,
+      required this.onBack,
+      required this.onSave});
+
+  final EmotionDefinition core;
+  final EmotionDefinition specific;
+  final bool saving;
+  final VoidCallback onBack;
+  final ValueChanged<EmotionDefinition?> onSave;
+
+  @override
+  Widget build(BuildContext context) {
+    final feelings = EmotionDefinition.childrenOf(specific.id);
+    final theme = Theme.of(context);
+    final background = core.core.flood(theme.scaffoldBackgroundColor);
+    final foreground = core.core.foregroundOn(background);
+    final buttonForeground = ThemeData.estimateBrightnessForColor(foreground) == Brightness.dark
+        ? Colors.white
+        : Colors.black;
+    return Padding(
+      key: const ValueKey('deep'),
+      padding: const EdgeInsets.fromLTRB(20, 24, 20, 32),
+      child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+        Align(
+            alignment: Alignment.centerLeft,
+            child: TextButton.icon(
+                onPressed: onBack, icon: const Icon(Icons.arrow_back), label: const Text('Back'))),
+        Wrap(spacing: 6, crossAxisAlignment: WrapCrossAlignment.center, children: [
+          Chip(label: Text(core.label)),
+          const Icon(Icons.chevron_right, size: 18),
+          Chip(label: Text(specific.label)),
+        ]),
+        const SizedBox(height: 24),
+        Text('Even more precisely?',
+            style: theme.textTheme.headlineSmall?.copyWith(color: foreground)),
+        const SizedBox(height: 6),
+        Text('Optional — pick one, or save as-is below.', style: TextStyle(color: foreground)),
+        const SizedBox(height: 26),
+        Expanded(
+          child: ListView.separated(
+            itemCount: feelings.length,
+            separatorBuilder: (_, __) => const SizedBox(height: 10),
+            itemBuilder: (context, index) => OutlinedButton.icon(
+              style: OutlinedButton.styleFrom(
+                  alignment: Alignment.centerLeft,
+                  padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 18),
+                  backgroundColor: core.core.soft(theme.colorScheme.surface),
+                  foregroundColor: foreground,
+                  side: BorderSide(color: core.core.border)),
+              onPressed: saving ? null : () => onSave(feelings[index]),
+              icon: const Icon(Icons.circle_outlined, size: 12),
+              label: Text(feelings[index].label,
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(color: foreground)),
+            ),
+          ),
+        ),
+        FilledButton(
+          onPressed: saving ? null : () => onSave(null),
+          style: FilledButton.styleFrom(
+              backgroundColor: foreground,
+              foregroundColor: buttonForeground,
+              padding: const EdgeInsets.all(17)),
+          child: Text(saving ? 'Saving…' : 'Save as “${specific.label}”'),
+        ),
+      ]),
+    );
   }
 }

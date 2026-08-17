@@ -6,84 +6,176 @@ part of 'streak_service.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$streakServiceHash() => r'3bb990fa74e92323b536afa3c12e254b2638be08';
+// GENERATED CODE - DO NOT MODIFY BY HAND
+// ignore_for_file: type=lint, type=warning
+/// Provides an instance of [StreakService].
+
+@ProviderFor(streakService)
+final streakServiceProvider = StreakServiceProvider._();
 
 /// Provides an instance of [StreakService].
-///
-/// Copied from [streakService].
-@ProviderFor(streakService)
-final streakServiceProvider = AutoDisposeProvider<StreakService>.internal(
-  streakService,
-  name: r'streakServiceProvider',
-  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-      ? null
-      : _$streakServiceHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
-typedef StreakServiceRef = AutoDisposeProviderRef<StreakService>;
-String _$streakHash() => r'fd03e472ea8a73e9cd7db2453edf89b4de1cdc9c';
+final class StreakServiceProvider
+    extends $FunctionalProvider<StreakService, StreakService, StreakService>
+    with $Provider<StreakService> {
+  /// Provides an instance of [StreakService].
+  StreakServiceProvider._()
+      : super(
+          from: null,
+          argument: null,
+          retry: null,
+          name: r'streakServiceProvider',
+          isAutoDispose: true,
+          dependencies: null,
+          $allTransitiveDependencies: null,
+        );
+
+  @override
+  String debugGetCreateSourceHash() => _$streakServiceHash();
+
+  @$internal
+  @override
+  $ProviderElement<StreakService> $createElement($ProviderPointer pointer) =>
+      $ProviderElement(pointer);
+
+  @override
+  StreakService create(Ref ref) {
+    return streakService(ref);
+  }
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(StreakService value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<StreakService>(value),
+    );
+  }
+}
+
+String _$streakServiceHash() => r'3bb990fa74e92323b536afa3c12e254b2638be08';
 
 /// Provider for the current [Streak].
 ///
 /// It resets the streak if it is broken.
-///
-/// Copied from [streak].
-@ProviderFor(streak)
-final streakProvider = AutoDisposeFutureProvider<Streak>.internal(
-  streak,
-  name: r'streakProvider',
-  debugGetCreateSourceHash:
-      const bool.fromEnvironment('dart.vm.product') ? null : _$streakHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
-typedef StreakRef = AutoDisposeFutureProviderRef<Streak>;
-String _$longestStreakHash() => r'2ea6fa5d5acdb6f866bcc649ba05e54785ef4b11';
+@ProviderFor(streak)
+final streakProvider = StreakProvider._();
+
+/// Provider for the current [Streak].
+///
+/// It resets the streak if it is broken.
+
+final class StreakProvider
+    extends $FunctionalProvider<AsyncValue<Streak>, Streak, FutureOr<Streak>>
+    with $FutureModifier<Streak>, $FutureProvider<Streak> {
+  /// Provider for the current [Streak].
+  ///
+  /// It resets the streak if it is broken.
+  StreakProvider._()
+      : super(
+          from: null,
+          argument: null,
+          retry: null,
+          name: r'streakProvider',
+          isAutoDispose: true,
+          dependencies: null,
+          $allTransitiveDependencies: null,
+        );
+
+  @override
+  String debugGetCreateSourceHash() => _$streakHash();
+
+  @$internal
+  @override
+  $FutureProviderElement<Streak> $createElement($ProviderPointer pointer) =>
+      $FutureProviderElement(pointer);
+
+  @override
+  FutureOr<Streak> create(Ref ref) {
+    return streak(ref);
+  }
+}
+
+String _$streakHash() => r'fd03e472ea8a73e9cd7db2453edf89b4de1cdc9c';
 
 /// Provides a stream of the longest [Streak].
-///
-/// Copied from [longestStreak].
-@ProviderFor(longestStreak)
-final longestStreakProvider = AutoDisposeStreamProvider<Streak?>.internal(
-  longestStreak,
-  name: r'longestStreakProvider',
-  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-      ? null
-      : _$longestStreakHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
-typedef LongestStreakRef = AutoDisposeStreamProviderRef<Streak?>;
-String _$incrementStreakHash() => r'4bf2ff28e5cb5dce95bc97b79a0b5c6963ec649c';
+@ProviderFor(longestStreak)
+final longestStreakProvider = LongestStreakProvider._();
+
+/// Provides a stream of the longest [Streak].
+
+final class LongestStreakProvider
+    extends $FunctionalProvider<AsyncValue<Streak?>, Streak?, Stream<Streak?>>
+    with $FutureModifier<Streak?>, $StreamProvider<Streak?> {
+  /// Provides a stream of the longest [Streak].
+  LongestStreakProvider._()
+      : super(
+          from: null,
+          argument: null,
+          retry: null,
+          name: r'longestStreakProvider',
+          isAutoDispose: true,
+          dependencies: null,
+          $allTransitiveDependencies: null,
+        );
+
+  @override
+  String debugGetCreateSourceHash() => _$longestStreakHash();
+
+  @$internal
+  @override
+  $StreamProviderElement<Streak?> $createElement($ProviderPointer pointer) =>
+      $StreamProviderElement(pointer);
+
+  @override
+  Stream<Streak?> create(Ref ref) {
+    return longestStreak(ref);
+  }
+}
+
+String _$longestStreakHash() => r'2ea6fa5d5acdb6f866bcc649ba05e54785ef4b11';
 
 /// Increments the current streak.
 ///
 /// It forces the [streakProvider] to refresh after updating the streak.
-///
-/// Copied from [incrementStreak].
-@ProviderFor(incrementStreak)
-final incrementStreakProvider = AutoDisposeFutureProvider<void>.internal(
-  incrementStreak,
-  name: r'incrementStreakProvider',
-  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-      ? null
-      : _$incrementStreakHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
-typedef IncrementStreakRef = AutoDisposeFutureProviderRef<void>;
-// ignore_for_file: type=lint
-// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package
+@ProviderFor(incrementStreak)
+final incrementStreakProvider = IncrementStreakProvider._();
+
+/// Increments the current streak.
+///
+/// It forces the [streakProvider] to refresh after updating the streak.
+
+final class IncrementStreakProvider
+    extends $FunctionalProvider<AsyncValue<void>, void, FutureOr<void>>
+    with $FutureModifier<void>, $FutureProvider<void> {
+  /// Increments the current streak.
+  ///
+  /// It forces the [streakProvider] to refresh after updating the streak.
+  IncrementStreakProvider._()
+      : super(
+          from: null,
+          argument: null,
+          retry: null,
+          name: r'incrementStreakProvider',
+          isAutoDispose: true,
+          dependencies: null,
+          $allTransitiveDependencies: null,
+        );
+
+  @override
+  String debugGetCreateSourceHash() => _$incrementStreakHash();
+
+  @$internal
+  @override
+  $FutureProviderElement<void> $createElement($ProviderPointer pointer) =>
+      $FutureProviderElement(pointer);
+
+  @override
+  FutureOr<void> create(Ref ref) {
+    return incrementStreak(ref);
+  }
+}
+
+String _$incrementStreakHash() => r'52a9c4a743d9b3835341452fd3ec9491f2414c85';

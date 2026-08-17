@@ -4,8 +4,6 @@ import 'package:illemo/src/features/emotions/domain/models/emotion.dart';
 import 'package:illemo/src/utils/date.dart';
 import 'package:uuid/uuid.dart';
 
-typedef EmotionLogID = String;
-
 @immutable
 class EmotionLogModel {
   const EmotionLogModel({

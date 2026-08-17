@@ -30,9 +30,15 @@ class StreakWidget extends StatelessWidget {
       fontWeight: FontWeight.bold,
       color: _getStreakColor(),
     );
-    return Column(
+    final color = _getStreakColor();
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      mainAxisSize: MainAxisSize.min,
       children: [
+        Icon(Icons.local_fire_department, color: color, size: 32),
+        const SizedBox(width: Sizes.p12),
         Text('${streak.count}', style: streakStyle),
+        const SizedBox(width: Sizes.p8),
         Text('day streak', style: Theme.of(context).textTheme.bodyLarge),
       ],
     );

@@ -3,7 +3,7 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:illemo/src/features/emotions/domain/models/emotion_log_model.dart';
+import 'package:illemo/src/features/emotions/domain/entities/emotion_log.dart';
 import 'package:illemo/src/features/emotions/presentation/screens/dashboard.dart';
 import 'package:illemo/src/features/emotions/service/emotion_today_service.dart';
 
@@ -34,7 +34,7 @@ class EmotionUpload extends ConsumerWidget {
         child: CircularProgressIndicator.adaptive(),
       );
 
-  Widget _buildSuccess({required onPressed}) {
+  Widget _buildSuccess({required VoidCallback onPressed}) {
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -62,7 +62,7 @@ class EmotionUpload extends ConsumerWidget {
     );
   }
 
-  Widget _buildError(error, stackTrace, {required onPressed}) {
+  Widget _buildError(Object error, StackTrace stackTrace, {required VoidCallback onPressed}) {
     log('$error', error: error, stackTrace: stackTrace);
     return Center(
       child: Column(

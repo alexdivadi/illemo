@@ -6,203 +6,150 @@ part of 'emotion_today_service.dart';
 // RiverpodGenerator
 // **************************************************************************
 
+// GENERATED CODE - DO NOT MODIFY BY HAND
+// ignore_for_file: type=lint, type=warning
+
+@ProviderFor(emotionTodayService)
+final emotionTodayServiceProvider = EmotionTodayServiceProvider._();
+
+final class EmotionTodayServiceProvider extends $FunctionalProvider<
+    EmotionTodayService,
+    EmotionTodayService,
+    EmotionTodayService> with $Provider<EmotionTodayService> {
+  EmotionTodayServiceProvider._()
+      : super(
+          from: null,
+          argument: null,
+          retry: null,
+          name: r'emotionTodayServiceProvider',
+          isAutoDispose: true,
+          dependencies: null,
+          $allTransitiveDependencies: null,
+        );
+
+  @override
+  String debugGetCreateSourceHash() => _$emotionTodayServiceHash();
+
+  @$internal
+  @override
+  $ProviderElement<EmotionTodayService> $createElement(
+          $ProviderPointer pointer) =>
+      $ProviderElement(pointer);
+
+  @override
+  EmotionTodayService create(Ref ref) {
+    return emotionTodayService(ref);
+  }
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(EmotionTodayService value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<EmotionTodayService>(value),
+    );
+  }
+}
+
 String _$emotionTodayServiceHash() =>
     r'd1f922de4fe5ce0e18ac99c5979a45d74b121cc7';
 
-/// See also [emotionTodayService].
-@ProviderFor(emotionTodayService)
-final emotionTodayServiceProvider =
-    AutoDisposeProvider<EmotionTodayService>.internal(
-  emotionTodayService,
-  name: r'emotionTodayServiceProvider',
-  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-      ? null
-      : _$emotionTodayServiceHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
-
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
-typedef EmotionTodayServiceRef = AutoDisposeProviderRef<EmotionTodayService>;
-String _$uploadEmotionLogHash() => r'cbb2b2b74746a72682eda2358c00bc10d8304834';
-
-/// Copied from Dart SDK
-class _SystemHash {
-  _SystemHash._();
-
-  static int combine(int hash, int value) {
-    // ignore: parameter_assignments
-    hash = 0x1fffffff & (hash + value);
-    // ignore: parameter_assignments
-    hash = 0x1fffffff & (hash + ((0x0007ffff & hash) << 10));
-    return hash ^ (hash >> 6);
-  }
-
-  static int finish(int hash) {
-    // ignore: parameter_assignments
-    hash = 0x1fffffff & (hash + ((0x03ffffff & hash) << 3));
-    // ignore: parameter_assignments
-    hash = hash ^ (hash >> 11);
-    return 0x1fffffff & (hash + ((0x00003fff & hash) << 15));
-  }
-}
-
 /// Uploads the emotion log to the server and increments the streak.
-///
-/// Copied from [uploadEmotionLog].
+
 @ProviderFor(uploadEmotionLog)
-const uploadEmotionLogProvider = UploadEmotionLogFamily();
+final uploadEmotionLogProvider = UploadEmotionLogFamily._();
 
 /// Uploads the emotion log to the server and increments the streak.
-///
-/// Copied from [uploadEmotionLog].
-class UploadEmotionLogFamily extends Family<AsyncValue<void>> {
+
+final class UploadEmotionLogProvider
+    extends $FunctionalProvider<AsyncValue<void>, void, FutureOr<void>>
+    with $FutureModifier<void>, $FutureProvider<void> {
   /// Uploads the emotion log to the server and increments the streak.
-  ///
-  /// Copied from [uploadEmotionLog].
-  const UploadEmotionLogFamily();
-
-  /// Uploads the emotion log to the server and increments the streak.
-  ///
-  /// Copied from [uploadEmotionLog].
-  UploadEmotionLogProvider call(
-    List<int> emotionIds,
-    String? id,
-  ) {
-    return UploadEmotionLogProvider(
-      emotionIds,
-      id,
-    );
-  }
-
-  @override
-  UploadEmotionLogProvider getProviderOverride(
-    covariant UploadEmotionLogProvider provider,
-  ) {
-    return call(
-      provider.emotionIds,
-      provider.id,
-    );
-  }
-
-  static const Iterable<ProviderOrFamily>? _dependencies = null;
-
-  @override
-  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
-
-  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
-
-  @override
-  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
-      _allTransitiveDependencies;
-
-  @override
-  String? get name => r'uploadEmotionLogProvider';
-}
-
-/// Uploads the emotion log to the server and increments the streak.
-///
-/// Copied from [uploadEmotionLog].
-class UploadEmotionLogProvider extends AutoDisposeFutureProvider<void> {
-  /// Uploads the emotion log to the server and increments the streak.
-  ///
-  /// Copied from [uploadEmotionLog].
-  UploadEmotionLogProvider(
-    List<int> emotionIds,
-    String? id,
-  ) : this._internal(
-          (ref) => uploadEmotionLog(
-            ref as UploadEmotionLogRef,
-            emotionIds,
-            id,
-          ),
-          from: uploadEmotionLogProvider,
+  UploadEmotionLogProvider._(
+      {required UploadEmotionLogFamily super.from,
+      required (
+        List<int>,
+        EmotionLogID?,
+      )
+          super.argument})
+      : super(
+          retry: null,
           name: r'uploadEmotionLogProvider',
-          debugGetCreateSourceHash:
-              const bool.fromEnvironment('dart.vm.product')
-                  ? null
-                  : _$uploadEmotionLogHash,
-          dependencies: UploadEmotionLogFamily._dependencies,
-          allTransitiveDependencies:
-              UploadEmotionLogFamily._allTransitiveDependencies,
-          emotionIds: emotionIds,
-          id: id,
+          isAutoDispose: true,
+          dependencies: null,
+          $allTransitiveDependencies: null,
         );
 
-  UploadEmotionLogProvider._internal(
-    super._createNotifier, {
-    required super.name,
-    required super.dependencies,
-    required super.allTransitiveDependencies,
-    required super.debugGetCreateSourceHash,
-    required super.from,
-    required this.emotionIds,
-    required this.id,
-  }) : super.internal();
-
-  final List<int> emotionIds;
-  final String? id;
+  @override
+  String debugGetCreateSourceHash() => _$uploadEmotionLogHash();
 
   @override
-  Override overrideWith(
-    FutureOr<void> Function(UploadEmotionLogRef provider) create,
-  ) {
-    return ProviderOverride(
-      origin: this,
-      override: UploadEmotionLogProvider._internal(
-        (ref) => create(ref as UploadEmotionLogRef),
-        from: from,
-        name: null,
-        dependencies: null,
-        allTransitiveDependencies: null,
-        debugGetCreateSourceHash: null,
-        emotionIds: emotionIds,
-        id: id,
-      ),
-    );
+  String toString() {
+    return r'uploadEmotionLogProvider'
+        ''
+        '$argument';
   }
 
+  @$internal
   @override
-  AutoDisposeFutureProviderElement<void> createElement() {
-    return _UploadEmotionLogProviderElement(this);
+  $FutureProviderElement<void> $createElement($ProviderPointer pointer) =>
+      $FutureProviderElement(pointer);
+
+  @override
+  FutureOr<void> create(Ref ref) {
+    final argument = this.argument as (
+      List<int>,
+      EmotionLogID?,
+    );
+    return uploadEmotionLog(
+      ref,
+      argument.$1,
+      argument.$2,
+    );
   }
 
   @override
   bool operator ==(Object other) {
-    return other is UploadEmotionLogProvider &&
-        other.emotionIds == emotionIds &&
-        other.id == id;
+    return other is UploadEmotionLogProvider && other.argument == argument;
   }
 
   @override
   int get hashCode {
-    var hash = _SystemHash.combine(0, runtimeType.hashCode);
-    hash = _SystemHash.combine(hash, emotionIds.hashCode);
-    hash = _SystemHash.combine(hash, id.hashCode);
-
-    return _SystemHash.finish(hash);
+    return argument.hashCode;
   }
 }
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
-mixin UploadEmotionLogRef on AutoDisposeFutureProviderRef<void> {
-  /// The parameter `emotionIds` of this provider.
-  List<int> get emotionIds;
+String _$uploadEmotionLogHash() => r'cbb2b2b74746a72682eda2358c00bc10d8304834';
 
-  /// The parameter `id` of this provider.
-  String? get id;
-}
+/// Uploads the emotion log to the server and increments the streak.
 
-class _UploadEmotionLogProviderElement
-    extends AutoDisposeFutureProviderElement<void> with UploadEmotionLogRef {
-  _UploadEmotionLogProviderElement(super.provider);
+final class UploadEmotionLogFamily extends $Family
+    with
+        $FunctionalFamilyOverride<
+            FutureOr<void>,
+            (
+              List<int>,
+              EmotionLogID?,
+            )> {
+  UploadEmotionLogFamily._()
+      : super(
+          retry: null,
+          name: r'uploadEmotionLogProvider',
+          dependencies: null,
+          $allTransitiveDependencies: null,
+          isAutoDispose: true,
+        );
+
+  /// Uploads the emotion log to the server and increments the streak.
+
+  UploadEmotionLogProvider call(
+    List<int> emotionIds,
+    EmotionLogID? id,
+  ) =>
+      UploadEmotionLogProvider._(argument: (
+        emotionIds,
+        id,
+      ), from: this);
 
   @override
-  List<int> get emotionIds => (origin as UploadEmotionLogProvider).emotionIds;
-  @override
-  String? get id => (origin as UploadEmotionLogProvider).id;
+  String toString() => r'uploadEmotionLogProvider';
 }
-// ignore_for_file: type=lint
-// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

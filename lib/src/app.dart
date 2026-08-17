@@ -5,18 +5,23 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:force_update_helper/force_update_helper.dart';
 import 'package:illemo/src/routing/app_router.dart';
 import 'package:illemo/src/routing/app_startup.dart';
+import 'package:illemo/src/features/settings/application/reminder_service.dart';
+import 'package:illemo/src/features/settings/application/settings_controller.dart';
 import 'package:illemo/src/utils/alert_dialogs.dart';
+import 'package:illemo/src/theme/app_theme.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class MyApp extends ConsumerWidget {
   const MyApp({super.key});
 
-  static const primaryColor = Colors.lime;
-  static const onPrimaryColor = Colors.black;
-
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final goRouter = ref.watch(goRouterProvider);
+    final settings = ref.watch(settingsControllerProvider);
+    ref.watch(reminderServiceProvider);
+    ref.listen(reminderTapsProvider, (_, next) {
+      if (next case AsyncData(:final value)) goRouter.go(value);
+    });
     return MaterialApp.router(
       routerConfig: goRouter,
       builder: (_, child) {
@@ -62,33 +67,9 @@ class MyApp extends ConsumerWidget {
           ),
         );
       },
-      theme: ThemeData(
-        colorSchemeSeed: primaryColor,
-        unselectedWidgetColor: Colors.grey,
-        appBarTheme: const AppBarTheme(
-          backgroundColor: primaryColor,
-          foregroundColor: onPrimaryColor,
-          elevation: 2.0,
-          centerTitle: true,
-        ),
-        scaffoldBackgroundColor: Colors.grey[200],
-        dividerColor: Colors.grey[400],
-        elevatedButtonTheme: ElevatedButtonThemeData(
-          style: ElevatedButton.styleFrom(
-            backgroundColor: primaryColor,
-            foregroundColor: onPrimaryColor,
-          ),
-        ),
-        outlinedButtonTheme: OutlinedButtonThemeData(
-          style: OutlinedButton.styleFrom(
-            backgroundColor: primaryColor,
-            foregroundColor: onPrimaryColor,
-          ),
-        ),
-        floatingActionButtonTheme: const FloatingActionButtonThemeData(
-          backgroundColor: primaryColor,
-        ),
-      ),
+      theme: AppTheme.light,
+      darkTheme: AppTheme.dark,
+      themeMode: settings.value?.darkMode ?? false ? ThemeMode.dark : ThemeMode.light,
       debugShowCheckedModeBanner: false,
     );
   }

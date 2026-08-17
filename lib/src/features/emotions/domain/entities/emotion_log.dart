@@ -1,6 +1,7 @@
 import 'package:equatable/equatable.dart';
 import 'package:illemo/src/features/emotions/domain/models/emotion.dart';
-import 'package:illemo/src/features/emotions/domain/models/emotion_log_model.dart';
+
+typedef EmotionLogID = String;
 
 class EmotionLog extends Equatable {
   const EmotionLog({

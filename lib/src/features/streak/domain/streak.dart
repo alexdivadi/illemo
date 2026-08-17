@@ -1,5 +1,6 @@
 import 'package:equatable/equatable.dart';
-import 'package:illemo/src/features/streak/domain/streak_model.dart';
+
+typedef StreakID = String;
 
 class Streak extends Equatable {
   const Streak({

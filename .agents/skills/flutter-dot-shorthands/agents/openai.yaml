@@ -1,0 +1,4 @@
+interface:
+  display_name: "Flutter Dot Shorthands"
+  short_description: "Apply Dart dot shorthand syntax safely in Flutter code"
+  default_prompt: "Use Dart dot shorthands where context makes the inferred type clear, then format and analyze the changed Flutter code."

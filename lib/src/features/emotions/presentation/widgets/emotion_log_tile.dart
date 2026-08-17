@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:illemo/src/constants/app_sizes.dart';
 import 'package:illemo/src/features/emotions/domain/entities/emotion_log.dart';
+import 'package:illemo/src/theme/app_colors.dart';
 
 class EmotionLogTile extends StatelessWidget {
   const EmotionLogTile({
@@ -31,13 +32,17 @@ class EmotionLogTile extends StatelessWidget {
                         height: height,
                         width: double.infinity,
                         padding: const EdgeInsets.all(Sizes.p16),
-                        color: emotion.color,
+                        color: emotion.category.softColor,
                         child: Center(
                           child: showNames
                               ? FittedBox(
-                                  child: Text('$emotion',
-                                      style:
-                                          TextStyle(fontSize: Sizes.p24, color: emotion.textColor)),
+                                  child: Text(
+                                    '$emotion',
+                                    style: TextStyle(
+                                      fontSize: Sizes.p24,
+                                      color: emotion.category.baseColor.shade900,
+                                    ),
+                                  ),
                                 )
                               : null,
                         ),
@@ -46,7 +51,7 @@ class EmotionLogTile extends StatelessWidget {
                       return Container(
                         height: height,
                         width: double.infinity,
-                        color: Colors.grey[300],
+                        color: AppColors.chip,
                       );
                     }
                   }),
@@ -54,7 +59,7 @@ class EmotionLogTile extends StatelessWidget {
               : Container(
                   height: double.infinity,
                   width: double.infinity,
-                  color: Colors.grey[300],
+                  color: AppColors.chip,
                 ),
         ),
         if (child != null) child!,

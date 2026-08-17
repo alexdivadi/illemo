@@ -1,0 +1,4 @@
+interface:
+  display_name: "Use Riverpod"
+  short_description: "Build generated Riverpod state safely"
+  default_prompt: "Use $flutter-use-riverpod to implement this Flutter state-management change with generated providers."

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:illemo/src/common_widgets/primary_button.dart';
 import 'package:illemo/src/common_widgets/responsive_center.dart';
@@ -35,11 +34,10 @@ class OnboardingScreen extends ConsumerWidget {
               textAlign: TextAlign.center,
             ),
             gapH16,
-            SvgPicture.asset(
-              'assets/common/time-tracking.svg',
-              width: 200,
-              height: 200,
-              semanticsLabel: 'Time tracking logo',
+            const Icon(
+              Icons.mood,
+              size: 160,
+              semanticLabel: 'Emotion journal',
             ),
             gapH16,
             PrimaryButton(
@@ -50,8 +48,7 @@ class OnboardingScreen extends ConsumerWidget {
                   : () async {
                       await ref.read(onboardingControllerProvider.notifier).completeOnboarding();
                       if (context.mounted) {
-                        // go to sign in page after completing onboarding
-                        context.goNamed(AppRoute.signIn.name);
+                        context.goNamed(AppRoute.dashboard.name);
                       }
                     },
             ),

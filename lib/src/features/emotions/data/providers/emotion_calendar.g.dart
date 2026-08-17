@@ -6,157 +6,82 @@ part of 'emotion_calendar.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$emotionCalendarHash() => r'b1f48a784c0804308c460e19e94e8e0eb916009e';
+// GENERATED CODE - DO NOT MODIFY BY HAND
+// ignore_for_file: type=lint, type=warning
 
-/// Copied from Dart SDK
-class _SystemHash {
-  _SystemHash._();
-
-  static int combine(int hash, int value) {
-    // ignore: parameter_assignments
-    hash = 0x1fffffff & (hash + value);
-    // ignore: parameter_assignments
-    hash = 0x1fffffff & (hash + ((0x0007ffff & hash) << 10));
-    return hash ^ (hash >> 6);
-  }
-
-  static int finish(int hash) {
-    // ignore: parameter_assignments
-    hash = 0x1fffffff & (hash + ((0x03ffffff & hash) << 3));
-    // ignore: parameter_assignments
-    hash = hash ^ (hash >> 11);
-    return 0x1fffffff & (hash + ((0x00003fff & hash) << 15));
-  }
-}
-
-/// See also [emotionCalendar].
 @ProviderFor(emotionCalendar)
-const emotionCalendarProvider = EmotionCalendarFamily();
+final emotionCalendarProvider = EmotionCalendarFamily._();
 
-/// See also [emotionCalendar].
-class EmotionCalendarFamily extends Family<AsyncValue<List<EmotionLog>>> {
-  /// See also [emotionCalendar].
-  const EmotionCalendarFamily();
-
-  /// See also [emotionCalendar].
-  EmotionCalendarProvider call(
-    DateTime date,
-  ) {
-    return EmotionCalendarProvider(
-      date,
-    );
-  }
-
-  @override
-  EmotionCalendarProvider getProviderOverride(
-    covariant EmotionCalendarProvider provider,
-  ) {
-    return call(
-      provider.date,
-    );
-  }
-
-  static const Iterable<ProviderOrFamily>? _dependencies = null;
-
-  @override
-  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
-
-  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
-
-  @override
-  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
-      _allTransitiveDependencies;
-
-  @override
-  String? get name => r'emotionCalendarProvider';
-}
-
-/// See also [emotionCalendar].
-class EmotionCalendarProvider
-    extends AutoDisposeStreamProvider<List<EmotionLog>> {
-  /// See also [emotionCalendar].
-  EmotionCalendarProvider(
-    DateTime date,
-  ) : this._internal(
-          (ref) => emotionCalendar(
-            ref as EmotionCalendarRef,
-            date,
-          ),
-          from: emotionCalendarProvider,
+final class EmotionCalendarProvider extends $FunctionalProvider<
+        AsyncValue<List<EmotionLog>>,
+        List<EmotionLog>,
+        Stream<List<EmotionLog>>>
+    with $FutureModifier<List<EmotionLog>>, $StreamProvider<List<EmotionLog>> {
+  EmotionCalendarProvider._(
+      {required EmotionCalendarFamily super.from,
+      required DateTime super.argument})
+      : super(
+          retry: null,
           name: r'emotionCalendarProvider',
-          debugGetCreateSourceHash:
-              const bool.fromEnvironment('dart.vm.product')
-                  ? null
-                  : _$emotionCalendarHash,
-          dependencies: EmotionCalendarFamily._dependencies,
-          allTransitiveDependencies:
-              EmotionCalendarFamily._allTransitiveDependencies,
-          date: date,
+          isAutoDispose: true,
+          dependencies: null,
+          $allTransitiveDependencies: null,
         );
 
-  EmotionCalendarProvider._internal(
-    super._createNotifier, {
-    required super.name,
-    required super.dependencies,
-    required super.allTransitiveDependencies,
-    required super.debugGetCreateSourceHash,
-    required super.from,
-    required this.date,
-  }) : super.internal();
-
-  final DateTime date;
+  @override
+  String debugGetCreateSourceHash() => _$emotionCalendarHash();
 
   @override
-  Override overrideWith(
-    Stream<List<EmotionLog>> Function(EmotionCalendarRef provider) create,
-  ) {
-    return ProviderOverride(
-      origin: this,
-      override: EmotionCalendarProvider._internal(
-        (ref) => create(ref as EmotionCalendarRef),
-        from: from,
-        name: null,
-        dependencies: null,
-        allTransitiveDependencies: null,
-        debugGetCreateSourceHash: null,
-        date: date,
-      ),
-    );
+  String toString() {
+    return r'emotionCalendarProvider'
+        ''
+        '($argument)';
   }
 
+  @$internal
   @override
-  AutoDisposeStreamProviderElement<List<EmotionLog>> createElement() {
-    return _EmotionCalendarProviderElement(this);
+  $StreamProviderElement<List<EmotionLog>> $createElement(
+          $ProviderPointer pointer) =>
+      $StreamProviderElement(pointer);
+
+  @override
+  Stream<List<EmotionLog>> create(Ref ref) {
+    final argument = this.argument as DateTime;
+    return emotionCalendar(
+      ref,
+      argument,
+    );
   }
 
   @override
   bool operator ==(Object other) {
-    return other is EmotionCalendarProvider && other.date == date;
+    return other is EmotionCalendarProvider && other.argument == argument;
   }
 
   @override
   int get hashCode {
-    var hash = _SystemHash.combine(0, runtimeType.hashCode);
-    hash = _SystemHash.combine(hash, date.hashCode);
-
-    return _SystemHash.finish(hash);
+    return argument.hashCode;
   }
 }
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
-mixin EmotionCalendarRef on AutoDisposeStreamProviderRef<List<EmotionLog>> {
-  /// The parameter `date` of this provider.
-  DateTime get date;
-}
+String _$emotionCalendarHash() => r'f150b73a486c8af7c1557e82ea04a09fdfc55bbc';
 
-class _EmotionCalendarProviderElement
-    extends AutoDisposeStreamProviderElement<List<EmotionLog>>
-    with EmotionCalendarRef {
-  _EmotionCalendarProviderElement(super.provider);
+final class EmotionCalendarFamily extends $Family
+    with $FunctionalFamilyOverride<Stream<List<EmotionLog>>, DateTime> {
+  EmotionCalendarFamily._()
+      : super(
+          retry: null,
+          name: r'emotionCalendarProvider',
+          dependencies: null,
+          $allTransitiveDependencies: null,
+          isAutoDispose: true,
+        );
+
+  EmotionCalendarProvider call(
+    DateTime date,
+  ) =>
+      EmotionCalendarProvider._(argument: date, from: this);
 
   @override
-  DateTime get date => (origin as EmotionCalendarProvider).date;
+  String toString() => r'emotionCalendarProvider';
 }
-// ignore_for_file: type=lint
-// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

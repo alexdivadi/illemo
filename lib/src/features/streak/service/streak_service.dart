@@ -1,6 +1,7 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:illemo/src/features/streak/data/streak_repository.dart';
 import 'package:illemo/src/features/streak/domain/streak.dart';
+import 'package:illemo/src/features/settings/application/reminder_service.dart';
+import 'package:illemo/src/features/settings/application/settings_controller.dart';
 import 'package:illemo/src/utils/new_day_stream.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -106,5 +107,10 @@ Future<void> incrementStreak(Ref ref) async {
   final updatedStreak = streak.increment();
   final StreakService streakService = ref.read(streakServiceProvider);
   await streakService.updateStreak(updatedStreak);
+  final settings = await ref.read(settingsControllerProvider.future);
+  if (settings.streakReminder) {
+    await (await ref.read(reminderServiceProvider.future))
+        .scheduleStreak(updatedStreak.lastUpdated);
+  }
   ref.invalidate(streakProvider);
 }

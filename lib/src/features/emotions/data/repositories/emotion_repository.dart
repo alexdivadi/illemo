@@ -1,21 +1,16 @@
 import 'dart:developer';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:illemo/src/features/authentication/data/firebase_auth_repository.dart';
-import 'package:illemo/src/features/authentication/domain/app_user.dart';
+import 'package:illemo/src/data/app_database.dart';
 import 'package:illemo/src/features/emotions/data/repositories/emotion_repository_local.dart';
 import 'package:illemo/src/features/emotions/domain/entities/emotion_log.dart';
 import 'package:illemo/src/features/emotions/domain/models/emotion_log_model.dart';
 import 'package:illemo/src/utils/date.dart';
-import 'package:illemo/src/utils/shared_preferences_provider.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 part 'emotion_repository.g.dart';
 
 /// Firestore implementation of [EmotionRepository].
-/// Requires [UserID] userID.
 class EmotionRepository {
   EmotionRepository({
     required this.userID,
@@ -25,9 +20,7 @@ class EmotionRepository {
   static String emotionsPath(String uid) => 'users/$uid/emotions';
 
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-  final UserID userID;
-
-  bool get isOffline => false;
+  final String userID;
 
   /// Adds a new emotion log to Firestore.
   ///
@@ -126,24 +119,11 @@ class EmotionRepository {
 }
 
 /// Provider for [EmotionRepository].
-/// Requires [UserID] userID.
-@riverpod
+@Riverpod(keepAlive: true)
 EmotionRepository emotionRepository(Ref ref) {
-  final currentUser = ref.watch(firebaseAuthProvider).currentUser;
-  if (currentUser == null) {
-    throw AssertionError('User can\'t be null when fetching emotions');
-  }
-
-  final EmotionRepository emotionRepository;
-
-  if (currentUser.isAnonymous) {
-    log('Using local storage for anonymous user');
-    final SharedPreferencesWithCache prefs = ref.watch(sharedPreferencesProvider).requireValue;
-    emotionRepository = EmotionRepositoryLocal(userID: currentUser.uid, prefs: prefs);
-  } else {
-    log('Using firestore for authenticated user');
-    emotionRepository = EmotionRepository(userID: currentUser.uid);
-  }
+  final emotionRepository = EmotionRepositoryLocal(
+    database: ref.watch(appDatabaseProvider).requireValue,
+  );
 
   ref.onDispose(() {
     emotionRepository.dispose();

@@ -1,13 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 import 'package:illemo/src/constants/app_sizes.dart';
 import 'package:illemo/src/features/emotions/data/providers/emotion_calendar.dart';
 import 'package:illemo/src/features/emotions/data/providers/emotion_stats.dart';
 import 'package:illemo/src/features/emotions/domain/entities/emotion_log.dart';
 import 'package:illemo/src/features/emotions/presentation/widgets/emotion_calendar.dart';
 import 'package:illemo/src/features/emotions/presentation/widgets/emotion_log_tile.dart';
-import 'package:illemo/src/routing/app_router.dart';
 import 'package:illemo/src/utils/date.dart';
 import 'package:illemo/src/utils/pluralize.dart';
 
@@ -25,7 +23,10 @@ class CalendarScreen extends ConsumerStatefulWidget {
 
 class _CalendarScreenState extends ConsumerState<CalendarScreen> {
   late final PageController _pageController;
+  late DateTime _currentDate;
   final today = DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day);
+
+  int _pageFor(DateTime date) => (today.year - date.year) * 12 + today.month - date.month;
 
   @override
   void dispose() {
@@ -36,20 +37,15 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
   @override
   void initState() {
     super.initState();
-    final currentDate = widget.date ?? today;
-    _pageController = PageController(
-      initialPage: (today.year - currentDate.year) * 12 + today.month - currentDate.month,
-    );
+    _currentDate = widget.date ?? today;
+    _pageController = PageController(initialPage: _pageFor(_currentDate));
   }
 
   @override
   Widget build(BuildContext context) {
-    /// The default date to show the calendar for.
-    final currentDate = widget.date ?? today;
     return Scaffold(
       resizeToAvoidBottomInset: false,
       appBar: AppBar(
-        title: const Text(CalendarScreen.title),
         actions: [
           IconButton(
             icon: const Icon(Icons.calendar_today),
@@ -58,15 +54,17 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
               final selectedDate = await showDatePicker(
                 context: context,
                 keyboardType: TextInputType.datetime,
-                initialDate: currentDate,
-                firstDate: DateTime(currentDate.year - 1),
+                initialDate: _currentDate,
+                firstDate: DateTime(today.year - 1),
                 lastDate: today,
               );
-              if (selectedDate != null) {
-                if (context.mounted) {
-                  context.pushReplacementNamed(AppRoute.calendarDate.name,
-                      pathParameters: {'date': selectedDate.date});
-                }
+              if (selectedDate != null && context.mounted) {
+                setState(() => _currentDate = selectedDate);
+                await _pageController.animateToPage(
+                  _pageFor(selectedDate),
+                  duration: const Duration(milliseconds: 250),
+                  curve: Curves.easeOut,
+                );
               }
             },
           ),
@@ -75,6 +73,9 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
       body: PageView.builder(
         reverse: true,
         controller: _pageController,
+        onPageChanged: (index) => setState(() {
+          _currentDate = DateTime(today.year, today.month - index);
+        }),
         itemBuilder: (BuildContext context, int index) {
           final targetDate = DateTime(
             today.year,

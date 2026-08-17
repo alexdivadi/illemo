@@ -1,4 +1,3 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:illemo/src/features/emotions/data/repositories/emotion_repository.dart';
 import 'package:illemo/src/features/emotions/domain/models/emotion.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
