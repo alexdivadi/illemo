@@ -17,9 +17,9 @@ class SettingsRepository {
 
   AppSettings load() => AppSettings(
         darkMode: preferences.getBool(_darkModeKey) ?? false,
-        dailyReminder: preferences.getBool(_dailyReminderKey) ?? false,
+        dailyReminder: preferences.getBool(_dailyReminderKey) ?? true,
         dailyReminderMinutes: preferences.getInt(_dailyReminderMinutesKey) ?? 8 * 60,
-        streakReminder: preferences.getBool(_streakReminderKey) ?? false,
+        streakReminder: preferences.getBool(_streakReminderKey) ?? true,
       );
 
   Future<void> save(AppSettings settings) async {

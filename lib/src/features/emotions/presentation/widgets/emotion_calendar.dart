@@ -1,13 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:illemo/src/constants/app_sizes.dart';
-import 'package:illemo/src/features/emotions/domain/entities/emotion_log.dart';
+import 'package:illemo/src/features/emotions/domain/entities/emotion_entry.dart';
 import 'package:illemo/src/features/emotions/presentation/widgets/calendar_day.dart';
+import 'package:illemo/src/features/journal/domain/entities/journal_entry.dart';
 import 'package:illemo/src/utils/date.dart';
 
 class EmotionCalendar extends StatelessWidget {
-  const EmotionCalendar({super.key, required this.emotionLogs, required this.currentDate});
+  const EmotionCalendar({
+    super.key,
+    required this.emotionEntries,
+    required this.journalEntries,
+    required this.currentDate,
+  });
 
-  final List<EmotionLog> emotionLogs;
+  final List<EmotionEntry> emotionEntries;
+  final List<JournalEntry> journalEntries;
   final DateTime currentDate;
 
   static const months = [
@@ -36,7 +43,8 @@ class EmotionCalendar extends StatelessWidget {
         const WeekdayLabelsWidget(),
         Expanded(
             child: CalendarWidget(
-          emotionLogs: emotionLogs,
+          emotionEntries: emotionEntries,
+          journalEntries: journalEntries,
           currentDate: currentDate,
         )),
       ],
@@ -85,9 +93,15 @@ class WeekdayLabelsWidget extends StatelessWidget {
 }
 
 class CalendarWidget extends StatelessWidget {
-  const CalendarWidget({super.key, required this.emotionLogs, required this.currentDate});
+  const CalendarWidget({
+    super.key,
+    required this.emotionEntries,
+    required this.journalEntries,
+    required this.currentDate,
+  });
 
-  final List<EmotionLog> emotionLogs;
+  final List<EmotionEntry> emotionEntries;
+  final List<JournalEntry> journalEntries;
   final DateTime currentDate;
 
   @override
@@ -97,9 +111,11 @@ class CalendarWidget extends StatelessWidget {
     final weekdayOfFirstDay = firstDayOfMonth.weekday;
 
     // Create a set of dates with emotion logs for efficient lookup
-    final Map<String, EmotionLog> emotionLogDates = {
-      for (var log in emotionLogs) log.date.date: log
-    };
+    final emotionEntryDates = <String, List<EmotionEntry>>{};
+    for (final log in emotionEntries) {
+      emotionEntryDates.putIfAbsent(log.date.date, () => []).add(log);
+    }
+    final journalsByDate = {for (final entry in journalEntries) entry.date.date: entry};
 
     // Generate the leading empty days
     final leadingEmptyDays = List.generate(weekdayOfFirstDay, (index) => Container());
@@ -107,11 +123,13 @@ class CalendarWidget extends StatelessWidget {
     // Generate the days of the month
     final days = List.generate(daysInMonth, (index) {
       final day = firstDayOfMonth.add(Duration(days: index, hours: 0));
-      final emotionLog = emotionLogDates[day.date];
+      final emotionEntries = emotionEntryDates[day.date] ?? const [];
       return CalendarDay(
         date: day,
-        emotionLog: emotionLog,
-        isComplete: emotionLog != null && emotionLog.isComplete,
+        emotionEntries: emotionEntries,
+        journalEntry: journalsByDate[day.date],
+        isComplete:
+            emotionEntries.length == EmotionEntry.maxPerDay && journalsByDate.containsKey(day.date),
       );
     });
 

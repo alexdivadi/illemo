@@ -26,7 +26,7 @@ class StreakWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final streakStyle = TextStyle(
-      fontSize: Sizes.p48,
+      fontSize: Sizes.p24,
       fontWeight: FontWeight.bold,
       color: _getStreakColor(),
     );
@@ -35,8 +35,8 @@ class StreakWidget extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.center,
       mainAxisSize: MainAxisSize.min,
       children: [
-        Icon(Icons.local_fire_department, color: color, size: 32),
-        const SizedBox(width: Sizes.p12),
+        Icon(Icons.local_fire_department, color: color, size: 22),
+        const SizedBox(width: Sizes.p8),
         Text('${streak.count}', style: streakStyle),
         const SizedBox(width: Sizes.p8),
         Text('day streak', style: Theme.of(context).textTheme.bodyLarge),

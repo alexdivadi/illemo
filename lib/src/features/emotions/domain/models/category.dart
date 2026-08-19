@@ -39,3 +39,20 @@ enum Category implements Comparable<Category> {
     return name.capitalize();
   }
 }
+
+extension CategoryEmotionPresentation on Category {
+  Color get card => softColor;
+  Color get border => baseColor.shade300;
+  Color get foreground => baseColor.shade900;
+
+  Color cardFor(Color surface, Brightness brightness) => brightness == Brightness.dark
+      ? Color.alphaBlend(border.withValues(alpha: 0.18), surface)
+      : card;
+
+  Color soft(Color surface) => Color.alphaBlend(border.withValues(alpha: 0.20), surface);
+  Color flood(Color surface) => Color.alphaBlend(border.withValues(alpha: 0.42), surface);
+  Color foregroundOn(Color surface) =>
+      ThemeData.estimateBrightnessForColor(surface) == Brightness.dark
+          ? Color.alphaBlend(border.withValues(alpha: 0.35), Colors.white)
+          : foreground;
+}

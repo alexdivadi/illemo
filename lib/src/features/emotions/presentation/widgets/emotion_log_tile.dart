@@ -1,18 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:illemo/src/constants/app_sizes.dart';
-import 'package:illemo/src/features/emotions/domain/entities/emotion_log.dart';
+import 'package:illemo/src/features/emotions/domain/entities/emotion_entry.dart';
+import 'package:illemo/src/features/emotions/domain/models/category.dart';
+import 'package:illemo/src/features/emotions/domain/models/emotion.dart';
 import 'package:illemo/src/theme/app_colors.dart';
 
 class EmotionLogTile extends StatelessWidget {
   const EmotionLogTile({
     super.key,
-    required this.emotionLog,
+    required this.emotions,
     this.height = 100,
     this.showNames = false,
     this.child,
   });
 
-  final EmotionLog? emotionLog;
+  final List<Emotion> emotions;
   final double height;
   final bool showNames;
   final Widget? child;
@@ -22,17 +24,20 @@ class EmotionLogTile extends StatelessWidget {
     return Stack(
       children: [
         SizedBox(
-          height: height * EmotionLog.logSize,
-          child: emotionLog != null
+          height: height * EmotionEntry.maxPerDay,
+          child: emotions.isNotEmpty
               ? Column(
-                  children: List.generate(EmotionLog.logSize, (i) {
-                    if (emotionLog!.emotions.length > i) {
-                      final emotion = emotionLog!.emotions[i];
+                  children: List.generate(EmotionEntry.maxPerDay, (i) {
+                    if (emotions.length > i) {
+                      final emotion = emotions[i];
                       return Container(
                         height: height,
                         width: double.infinity,
                         padding: const EdgeInsets.all(Sizes.p16),
-                        color: emotion.category.softColor,
+                        color: emotion.category.cardFor(
+                          Theme.of(context).colorScheme.surface,
+                          Theme.of(context).brightness,
+                        ),
                         child: Center(
                           child: showNames
                               ? FittedBox(
@@ -40,7 +45,12 @@ class EmotionLogTile extends StatelessWidget {
                                     '$emotion',
                                     style: TextStyle(
                                       fontSize: Sizes.p24,
-                                      color: emotion.category.baseColor.shade900,
+                                      color: emotion.category.foregroundOn(
+                                        emotion.category.cardFor(
+                                          Theme.of(context).colorScheme.surface,
+                                          Theme.of(context).brightness,
+                                        ),
+                                      ),
                                     ),
                                   ),
                                 )
@@ -51,7 +61,9 @@ class EmotionLogTile extends StatelessWidget {
                       return Container(
                         height: height,
                         width: double.infinity,
-                        color: AppColors.chip,
+                        color: Theme.of(context).brightness == Brightness.dark
+                            ? Theme.of(context).colorScheme.surfaceContainerHigh
+                            : AppColors.chip,
                       );
                     }
                   }),
@@ -59,7 +71,9 @@ class EmotionLogTile extends StatelessWidget {
               : Container(
                   height: double.infinity,
                   width: double.infinity,
-                  color: AppColors.chip,
+                  color: Theme.of(context).brightness == Brightness.dark
+                      ? Theme.of(context).colorScheme.surfaceContainerHigh
+                      : AppColors.chip,
                 ),
         ),
         if (child != null) child!,

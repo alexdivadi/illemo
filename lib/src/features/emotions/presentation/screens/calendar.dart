@@ -3,9 +3,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:illemo/src/constants/app_sizes.dart';
 import 'package:illemo/src/features/emotions/data/providers/emotion_calendar.dart';
 import 'package:illemo/src/features/emotions/data/providers/emotion_stats.dart';
-import 'package:illemo/src/features/emotions/domain/entities/emotion_log.dart';
+import 'package:illemo/src/features/emotions/domain/entities/emotion_entry.dart';
 import 'package:illemo/src/features/emotions/presentation/widgets/emotion_calendar.dart';
 import 'package:illemo/src/features/emotions/presentation/widgets/emotion_log_tile.dart';
+import 'package:illemo/src/features/journal/data/journal_repository.dart';
 import 'package:illemo/src/utils/date.dart';
 import 'package:illemo/src/utils/pluralize.dart';
 
@@ -81,16 +82,36 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
             today.year,
             today.month - index,
           );
-          final emotionLogs = ref.watch(emotionCalendarProvider(targetDate));
+          final emotionEntries = ref.watch(emotionCalendarProvider(targetDate));
+          final journalEntries = ref.watch(journalRangeProvider(
+            targetDate.startOfMonth,
+            targetDate.endOfMonth,
+          ));
           final topEmotions = ref.watch(getTopEmotionsProvider(
             targetDate.startOfMonth,
             targetDate.endOfMonth,
           ));
           return Center(
-            child: emotionLogs.when(
-              data: (emotionLogs) {
-                final numGold = emotionLogs.where((log) => log.isComplete).length;
-                final numTotal = emotionLogs.length;
+            child: emotionEntries.when(
+              data: (emotionEntries) {
+                final journals = journalEntries.value;
+                if (journalEntries.hasError) {
+                  return Center(
+                      child: Text('Couldn’t load journal entries. ${journalEntries.error}'));
+                }
+                if (journals == null) {
+                  return const Center(child: CircularProgressIndicator.adaptive());
+                }
+                final logsByDay = <String, int>{};
+                for (final log in emotionEntries) {
+                  logsByDay.update(log.date.date, (count) => count + 1, ifAbsent: () => 1);
+                }
+                final journalDates = journals.map((entry) => entry.date.date).toSet();
+                final numGold = logsByDay.entries
+                    .where((entry) =>
+                        entry.value == EmotionEntry.maxPerDay && journalDates.contains(entry.key))
+                    .length;
+                final numTotal = logsByDay.length;
                 final totalDays = DateUtils.getDaysInMonth(targetDate.year, targetDate.month);
                 return Column(
                   children: [
@@ -98,7 +119,11 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
                       flex: 2,
                       child: Padding(
                         padding: const EdgeInsets.all(Sizes.p8),
-                        child: EmotionCalendar(emotionLogs: emotionLogs, currentDate: targetDate),
+                        child: EmotionCalendar(
+                          emotionEntries: emotionEntries,
+                          journalEntries: journals,
+                          currentDate: targetDate,
+                        ),
                       ),
                     ),
                     Flexible(
@@ -131,10 +156,7 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
                                             borderRadius: BorderRadius.circular(Sizes.p16),
                                           ),
                                           child: EmotionLogTile(
-                                            emotionLog: EmotionLog.fromEmotions(
-                                              emotions: data,
-                                              date: targetDate,
-                                            ),
+                                            emotions: data,
                                             height: 50,
                                             showNames: true,
                                           ),

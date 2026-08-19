@@ -1,12 +1,12 @@
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
-import 'package:illemo/src/features/emotions/domain/models/emotion_definition.dart';
+import 'package:illemo/src/features/emotions/domain/models/category.dart';
 
 class EmotionGlyph extends StatelessWidget {
   const EmotionGlyph({super.key, required this.emotion, this.size = 48});
 
-  final EmotionKey emotion;
+  final Category emotion;
   final double size;
 
   @override
@@ -21,7 +21,7 @@ class EmotionGlyph extends StatelessWidget {
 class _EmotionGlyphPainter extends CustomPainter {
   const _EmotionGlyphPainter(this.emotion, this.color);
 
-  final EmotionKey emotion;
+  final Category emotion;
   final Color color;
 
   @override
@@ -38,7 +38,7 @@ class _EmotionGlyphPainter extends CustomPainter {
       ..strokeCap = StrokeCap.round;
 
     switch (emotion) {
-      case EmotionKey.joy:
+      case Category.joyful:
         canvas.drawCircle(center, 9 * scale, paint);
         line.strokeWidth = 2.5 * scale;
         for (var degrees = 0; degrees < 360; degrees += 45) {
@@ -46,7 +46,7 @@ class _EmotionGlyphPainter extends CustomPainter {
           final direction = Offset(math.cos(angle), math.sin(angle));
           canvas.drawLine(center + direction * 14 * scale, center + direction * 21 * scale, line);
         }
-      case EmotionKey.sadness:
+      case Category.sad:
         final path = Path()
           ..moveTo(28 * scale, 5 * scale)
           ..cubicTo(28 * scale, 5 * scale, 10 * scale, 18 * scale, 10 * scale, 31 * scale)
@@ -55,7 +55,7 @@ class _EmotionGlyphPainter extends CustomPainter {
           ..cubicTo(46 * scale, 18 * scale, 28 * scale, 5 * scale, 28 * scale, 5 * scale)
           ..close();
         canvas.drawPath(path, paint..color = color.withValues(alpha: 0.82));
-      case EmotionKey.anger:
+      case Category.mad:
         canvas.drawPath(
           Path()
             ..moveTo(32 * scale, 5 * scale)
@@ -68,12 +68,12 @@ class _EmotionGlyphPainter extends CustomPainter {
             ..close(),
           paint,
         );
-      case EmotionKey.fear:
+      case Category.scared:
         line.strokeWidth = 5 * scale;
         canvas.drawArc(
             Rect.fromCircle(center: center, radius: 21 * scale), math.pi / 2, math.pi, false, line);
         canvas.drawCircle(center, 6 * scale, Paint()..color = color.withValues(alpha: 0.45));
-      case EmotionKey.disgust:
+      case Category.peaceful:
         line.strokeWidth = 4.5 * scale;
         final path = Path()..moveTo(4 * scale, 28 * scale);
         for (var x = 4.0; x < 52; x += 8) {
@@ -81,7 +81,7 @@ class _EmotionGlyphPainter extends CustomPainter {
               (x + 8) * scale, 28 * scale);
         }
         canvas.drawPath(path, line);
-      case EmotionKey.surprise:
+      case Category.powerful:
         for (var degrees = 0; degrees < 360; degrees += 30) {
           final angle = degrees * math.pi / 180;
           final direction = Offset(math.cos(angle), math.sin(angle));

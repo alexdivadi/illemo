@@ -13,8 +13,12 @@ part of 'emotion_today.dart';
 final emotionTodayProvider = EmotionTodayProvider._();
 
 final class EmotionTodayProvider extends $FunctionalProvider<
-        AsyncValue<EmotionLog?>, EmotionLog?, Stream<EmotionLog?>>
-    with $FutureModifier<EmotionLog?>, $StreamProvider<EmotionLog?> {
+        AsyncValue<List<EmotionEntry>>,
+        List<EmotionEntry>,
+        Stream<List<EmotionEntry>>>
+    with
+        $FutureModifier<List<EmotionEntry>>,
+        $StreamProvider<List<EmotionEntry>> {
   EmotionTodayProvider._()
       : super(
           from: null,
@@ -31,14 +35,14 @@ final class EmotionTodayProvider extends $FunctionalProvider<
 
   @$internal
   @override
-  $StreamProviderElement<EmotionLog?> $createElement(
+  $StreamProviderElement<List<EmotionEntry>> $createElement(
           $ProviderPointer pointer) =>
       $StreamProviderElement(pointer);
 
   @override
-  Stream<EmotionLog?> create(Ref ref) {
+  Stream<List<EmotionEntry>> create(Ref ref) {
     return emotionToday(ref);
   }
 }
 
-String _$emotionTodayHash() => r'af53ff41f371d4aa12bada3c92e54c3c7506a111';
+String _$emotionTodayHash() => r'cd4e115f782d855f80e063cb78d10fbb4a3dd534';

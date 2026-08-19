@@ -1,133 +1,92 @@
-import 'dart:developer';
+import 'dart:async';
 
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:illemo/src/data/app_database.dart';
-import 'package:illemo/src/features/emotions/data/repositories/emotion_repository_local.dart';
-import 'package:illemo/src/features/emotions/domain/entities/emotion_log.dart';
-import 'package:illemo/src/features/emotions/domain/models/emotion_log_model.dart';
+import 'package:illemo/src/features/emotions/domain/entities/emotion_entry.dart';
+import 'package:illemo/src/features/emotions/domain/models/emotion_entry_model.dart';
 import 'package:illemo/src/utils/date.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:sqflite/sqflite.dart';
 
 part 'emotion_repository.g.dart';
 
-/// Firestore implementation of [EmotionRepository].
 class EmotionRepository {
-  EmotionRepository({
-    required this.userID,
-  });
+  EmotionRepository(this.database);
 
-  /// Returns the Firestore path for the emotions collection of a specific user.
-  static String emotionsPath(String uid) => 'users/$uid/emotions';
+  final Database database;
+  final _changes = StreamController<void>.broadcast();
 
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-  final String userID;
-
-  /// Adds a new emotion log to Firestore.
-  ///
-  /// Converts the [EmotionLog] entity to a map using [EmotionLogModel] before adding it.
-  Future<EmotionLogID> addEmotionLog(EmotionLog emotionLog) async {
-    final EmotionLogModel emotionLogModel = EmotionLogModel.fromEntity(emotionLog);
-    final collectionRef = _firestore.collection(emotionsPath(userID));
-    // Check if date already exists. Try to enforce unique date constraint.
-    final querySnapshot =
-        await collectionRef.where('date', isEqualTo: emotionLogModel.date).limit(1).get();
-
-    if (querySnapshot.docs.isNotEmpty) {
-      final docRef = querySnapshot.docs.first.reference;
-      await docRef.update(emotionLogModel.toMap());
-      return docRef.id;
-    } else {
-      final docRef = collectionRef.doc(emotionLogModel.id);
-      await docRef.set(emotionLogModel.toMap());
-      return emotionLogModel.id;
-    }
+  Stream<List<EmotionEntry>> watchToday() {
+    final today = DateTime.now();
+    return watchRange(today, today);
   }
 
-  /// Updates an existing emotion log in Firestore.
-  ///
-  /// Converts the [EmotionLog] entity to a map using [EmotionLogModel] before updating it.
-  Future<void> updateEmotionLog(EmotionLogID id, EmotionLog emotionLog) async {
-    final docRef = _firestore.collection(emotionsPath(userID)).doc(id);
-    final emotionLogModel = EmotionLogModel.fromEntity(emotionLog, id: id);
-    final doc = await docRef.get();
-    if (doc.exists) {
-      await docRef.update(emotionLogModel.toMap());
-    } else {
-      await docRef.set(emotionLogModel.toMap());
-    }
-    log("Updated emotion log with ID: $id");
-  }
+  Stream<List<EmotionEntry>> watchRange(DateTime start, DateTime end) => _watch(() async {
+        final rows = await database.query(
+          'emotion_entries',
+          where: 'date >= ? AND date <= ?',
+          whereArgs: [start.date, end.date],
+          orderBy: 'logged_at ASC',
+        );
+        return rows.map(EmotionEntryModel.fromMap).map((model) => model.toEntity()).toList();
+      });
 
-  /// Deletes an emotion log from Firestore by its document ID.
-  Future<void> deleteEmotionLog(String id) async {
-    await _firestore.collection(emotionsPath(userID)).doc(id).delete();
-  }
-
-  /// Retrieves an emotion log from Firestore by its document ID.
-  ///
-  /// Returns the [EmotionLog] entity if found, otherwise returns null.
-  Future<EmotionLog?> getEmotionLog(String id) async {
-    DocumentSnapshot doc = await _firestore.collection(emotionsPath(userID)).doc(id).get();
-    if (doc.exists) {
-      return EmotionLogModel.fromMap(doc.data() as Map<String, dynamic>).toEntity();
-    }
-    return null;
-  }
-
-  /// Retrieves today's emotion log from Firestore.
-  ///
-  /// Returns the [EmotionLog] entity if found, otherwise returns null.
-  Stream<EmotionLog?> getEmotionLogToday() {
-    return _firestore
-        .collection(emotionsPath(userID))
-        .where('date', isEqualTo: DateTime.now().date)
-        .limit(1)
-        .snapshots()
-        .map((querySnapshot) {
-      if (querySnapshot.docs.isNotEmpty) {
-        return EmotionLogModel.fromMap(querySnapshot.docs.first.data()).toEntity();
+  Future<void> save(EmotionEntry entry) async {
+    await database.transaction((txn) async {
+      final existing = await txn.query(
+        'emotion_entries',
+        columns: ['id'],
+        where: 'id = ?',
+        whereArgs: [entry.id],
+        limit: 1,
+      );
+      final duplicate = Sqflite.firstIntValue(await txn.rawQuery(
+            'SELECT COUNT(*) FROM emotion_entries WHERE date = ? AND id != ? AND COALESCE(deep_id, specific_id) = ?',
+            [entry.loggedAt.date, entry.id, entry.emotionId],
+          )) ??
+          0;
+      if (duplicate > 0) throw StateError('${entry.label} is already logged today.');
+      if (existing.isEmpty) {
+        final count = Sqflite.firstIntValue(await txn.rawQuery(
+              'SELECT COUNT(*) FROM emotion_entries WHERE date = ?',
+              [entry.loggedAt.date],
+            )) ??
+            0;
+        if (count >= EmotionEntry.maxPerDay) {
+          throw StateError('${EmotionEntry.maxPerDay} feelings are already logged today.');
+        }
       }
-      return null;
+      await txn.insert(
+        'emotion_entries',
+        EmotionEntryModel.fromEntity(entry).toMap(),
+        conflictAlgorithm: ConflictAlgorithm.replace,
+      );
     });
+    _changes.add(null);
   }
 
-  /// Streams a list of emotion logs from Firestore within an optional date range.
-  ///
-  /// If [startDate] is provided, only logs from that date onwards are included.
-  /// If [endDate] is provided, only logs up to that date are included.
-  Stream<List<EmotionLog>> getEmotionLogs({
-    DateTime? startDate,
-    DateTime? endDate,
-  }) {
-    Query query = _firestore.collection(emotionsPath(userID));
-
-    if (startDate != null) {
-      query = query.where('date', isGreaterThanOrEqualTo: startDate.date);
-    }
-
-    if (endDate != null) {
-      query = query.where('date', isLessThanOrEqualTo: endDate.date);
-    }
-    return query.snapshots().map((snapshot) {
-      return snapshot.docs
-          .map((doc) => EmotionLogModel.fromMap(doc.data() as Map<String, dynamic>).toEntity())
-          .toList();
-    });
+  Future<void> delete(EmotionEntryID id) async {
+    await database.delete('emotion_entries', where: 'id = ?', whereArgs: [id]);
+    _changes.add(null);
   }
 
-  void dispose() {}
+  Stream<T> _watch<T>(Future<T> Function() load) async* {
+    yield await load();
+    await for (final _ in _changes.stream) {
+      yield await load();
+    }
+  }
+
+  void dispose() => _changes.close();
 }
 
-/// Provider for [EmotionRepository].
 @Riverpod(keepAlive: true)
 EmotionRepository emotionRepository(Ref ref) {
-  final emotionRepository = EmotionRepositoryLocal(
-    database: ref.watch(appDatabaseProvider).requireValue,
-  );
+  final repository = EmotionRepository(ref.watch(appDatabaseProvider).requireValue);
+  ref.onDispose(repository.dispose);
+  return repository;
+}
 
-  ref.onDispose(() {
-    emotionRepository.dispose();
-  });
-
-  return emotionRepository;
+@riverpod
+Stream<List<EmotionEntry>> emotionEntriesToday(Ref ref) {
+  return ref.watch(emotionRepositoryProvider).watchToday();
 }

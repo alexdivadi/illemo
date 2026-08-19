@@ -13,10 +13,15 @@ Future<void> createDatabaseSchema(Database db, int version) async {
       'CREATE TABLE streaks (id TEXT PRIMARY KEY, count INTEGER NOT NULL, timestamp INTEGER NOT NULL)');
   await db.execute('CREATE TABLE metadata (key TEXT PRIMARY KEY, value TEXT NOT NULL)');
   await _createEmotionEntriesTable(db);
+  await migrateJournalEntries(db);
 }
 
 Future<void> _createEmotionEntriesTable(DatabaseExecutor db) => db.execute(
       'CREATE TABLE emotion_entries (id TEXT PRIMARY KEY, core_id TEXT NOT NULL, specific_id TEXT NOT NULL, deep_id TEXT, logged_at INTEGER NOT NULL, date TEXT NOT NULL)',
+    );
+
+Future<void> migrateJournalEntries(DatabaseExecutor db) => db.execute(
+      'CREATE TABLE journal_entries (id TEXT PRIMARY KEY, body TEXT NOT NULL, date TEXT NOT NULL UNIQUE, updated_at INTEGER NOT NULL)',
     );
 
 Future<void> migrateEmotionEntries(DatabaseExecutor db) async {
@@ -83,13 +88,14 @@ Future<Database> appDatabase(Ref ref) async {
   final prefs = await ref.watch(sharedPreferencesProvider.future);
   final db = await openDatabase(
     '${await getDatabasesPath()}/illemo.db',
-    version: 2,
+    version: 3,
     onCreate: createDatabaseSchema,
     onUpgrade: (db, oldVersion, newVersion) async {
       if (oldVersion < 2) {
         await _createEmotionEntriesTable(db);
         await migrateEmotionEntries(db);
       }
+      if (oldVersion < 3) await migrateJournalEntries(db);
     },
   );
   if ((await db.query('metadata', where: 'key = ?', whereArgs: ['legacy_emotions_migrated']))

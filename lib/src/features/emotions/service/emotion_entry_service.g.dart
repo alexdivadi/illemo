@@ -51,4 +51,4 @@ final class EmotionEntryServiceProvider extends $FunctionalProvider<
 }
 
 String _$emotionEntryServiceHash() =>
-    r'1586a1fce24dda186138d471b4ffbe3598e69ced';
+    r'aa9ef68e26c5171db63712fb8954b63b0526de26';

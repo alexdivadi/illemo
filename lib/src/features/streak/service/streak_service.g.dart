@@ -159,7 +159,7 @@ final class IncrementStreakProvider
           argument: null,
           retry: null,
           name: r'incrementStreakProvider',
-          isAutoDispose: true,
+          isAutoDispose: false,
           dependencies: null,
           $allTransitiveDependencies: null,
         );
@@ -178,4 +178,4 @@ final class IncrementStreakProvider
   }
 }
 
-String _$incrementStreakHash() => r'52a9c4a743d9b3835341452fd3ec9491f2414c85';
+String _$incrementStreakHash() => r'1c6e71b04797f17a8b1439c8f89500554f094832';

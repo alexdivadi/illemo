@@ -13,10 +13,12 @@ part of 'emotion_calendar.dart';
 final emotionCalendarProvider = EmotionCalendarFamily._();
 
 final class EmotionCalendarProvider extends $FunctionalProvider<
-        AsyncValue<List<EmotionLog>>,
-        List<EmotionLog>,
-        Stream<List<EmotionLog>>>
-    with $FutureModifier<List<EmotionLog>>, $StreamProvider<List<EmotionLog>> {
+        AsyncValue<List<EmotionEntry>>,
+        List<EmotionEntry>,
+        Stream<List<EmotionEntry>>>
+    with
+        $FutureModifier<List<EmotionEntry>>,
+        $StreamProvider<List<EmotionEntry>> {
   EmotionCalendarProvider._(
       {required EmotionCalendarFamily super.from,
       required DateTime super.argument})
@@ -40,12 +42,12 @@ final class EmotionCalendarProvider extends $FunctionalProvider<
 
   @$internal
   @override
-  $StreamProviderElement<List<EmotionLog>> $createElement(
+  $StreamProviderElement<List<EmotionEntry>> $createElement(
           $ProviderPointer pointer) =>
       $StreamProviderElement(pointer);
 
   @override
-  Stream<List<EmotionLog>> create(Ref ref) {
+  Stream<List<EmotionEntry>> create(Ref ref) {
     final argument = this.argument as DateTime;
     return emotionCalendar(
       ref,
@@ -64,10 +66,10 @@ final class EmotionCalendarProvider extends $FunctionalProvider<
   }
 }
 
-String _$emotionCalendarHash() => r'f150b73a486c8af7c1557e82ea04a09fdfc55bbc';
+String _$emotionCalendarHash() => r'198d5f527cfda085ce1d132418fcf2e1262020a4';
 
 final class EmotionCalendarFamily extends $Family
-    with $FunctionalFamilyOverride<Stream<List<EmotionLog>>, DateTime> {
+    with $FunctionalFamilyOverride<Stream<List<EmotionEntry>>, DateTime> {
   EmotionCalendarFamily._()
       : super(
           retry: null,

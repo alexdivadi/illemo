@@ -70,7 +70,7 @@ final class GetTopEmotionsProvider extends $FunctionalProvider<
   }
 }
 
-String _$getTopEmotionsHash() => r'74f9ddfea2949df3aec38be9cf0449349e05111f';
+String _$getTopEmotionsHash() => r'63fa529d267c760c4961e3fa00e04142219419c4';
 
 final class GetTopEmotionsFamily extends $Family
     with

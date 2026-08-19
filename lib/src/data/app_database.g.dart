@@ -40,4 +40,4 @@ final class AppDatabaseProvider extends $FunctionalProvider<
   }
 }
 
-String _$appDatabaseHash() => r'6bee90ca68d33183289eac2f632e3e3f8bdd553b';
+String _$appDatabaseHash() => r'74d9e9b39932d2f61b85c07bd9ea39cd16b0eeed';

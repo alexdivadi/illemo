@@ -1,9 +1,9 @@
 class AppSettings {
   const AppSettings({
     this.darkMode = false,
-    this.dailyReminder = false,
+    this.dailyReminder = true,
     this.dailyReminderMinutes = 8 * 60,
-    this.streakReminder = false,
+    this.streakReminder = true,
   });
 
   final bool darkMode;

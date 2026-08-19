@@ -101,7 +101,7 @@ Stream<Streak?> longestStreak(Ref ref) {
 /// Increments the current streak.
 ///
 /// It forces the [streakProvider] to refresh after updating the streak.
-@riverpod
+@Riverpod(keepAlive: true)
 Future<void> incrementStreak(Ref ref) async {
   final streak = await ref.watch(streakProvider.future);
   final updatedStreak = streak.increment();

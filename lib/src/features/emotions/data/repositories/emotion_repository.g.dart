@@ -8,18 +8,14 @@ part of 'emotion_repository.dart';
 
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint, type=warning
-/// Provider for [EmotionRepository].
 
 @ProviderFor(emotionRepository)
 final emotionRepositoryProvider = EmotionRepositoryProvider._();
-
-/// Provider for [EmotionRepository].
 
 final class EmotionRepositoryProvider extends $FunctionalProvider<
     EmotionRepository,
     EmotionRepository,
     EmotionRepository> with $Provider<EmotionRepository> {
-  /// Provider for [EmotionRepository].
   EmotionRepositoryProvider._()
       : super(
           from: null,
@@ -54,4 +50,43 @@ final class EmotionRepositoryProvider extends $FunctionalProvider<
   }
 }
 
-String _$emotionRepositoryHash() => r'19d45bd30134b92359d7a9099479c48b0f9877c9';
+String _$emotionRepositoryHash() => r'b820a896f20d735c04a88fe0b78028b80558d43a';
+
+@ProviderFor(emotionEntriesToday)
+final emotionEntriesTodayProvider = EmotionEntriesTodayProvider._();
+
+final class EmotionEntriesTodayProvider extends $FunctionalProvider<
+        AsyncValue<List<EmotionEntry>>,
+        List<EmotionEntry>,
+        Stream<List<EmotionEntry>>>
+    with
+        $FutureModifier<List<EmotionEntry>>,
+        $StreamProvider<List<EmotionEntry>> {
+  EmotionEntriesTodayProvider._()
+      : super(
+          from: null,
+          argument: null,
+          retry: null,
+          name: r'emotionEntriesTodayProvider',
+          isAutoDispose: true,
+          dependencies: null,
+          $allTransitiveDependencies: null,
+        );
+
+  @override
+  String debugGetCreateSourceHash() => _$emotionEntriesTodayHash();
+
+  @$internal
+  @override
+  $StreamProviderElement<List<EmotionEntry>> $createElement(
+          $ProviderPointer pointer) =>
+      $StreamProviderElement(pointer);
+
+  @override
+  Stream<List<EmotionEntry>> create(Ref ref) {
+    return emotionEntriesToday(ref);
+  }
+}
+
+String _$emotionEntriesTodayHash() =>
+    r'b79dd6a6b96c7765d4dfd867d77252b442180b4c';

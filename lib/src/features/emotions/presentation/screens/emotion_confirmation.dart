@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:illemo/src/features/emotions/domain/entities/emotion_entry.dart';
-import 'package:illemo/src/features/emotions/domain/models/emotion_definition.dart';
-import 'package:illemo/src/features/emotions/data/repositories/emotion_entry_repository.dart';
+import 'package:illemo/src/features/emotions/domain/models/category.dart';
+import 'package:illemo/src/features/emotions/domain/models/emotion.dart';
+import 'package:illemo/src/features/emotions/data/repositories/emotion_repository.dart';
 import 'package:illemo/src/features/emotions/presentation/screens/dashboard.dart';
 import 'package:illemo/src/features/emotions/presentation/screens/emotion_picker.dart';
 import 'package:illemo/src/features/emotions/presentation/widgets/emotion_glyph.dart';
@@ -16,14 +17,14 @@ class EmotionConfirmationScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final core = entry.core;
+    final category = entry.category;
     final theme = Theme.of(context);
-    final background = core.core.flood(theme.scaffoldBackgroundColor);
-    final foreground = core.core.foregroundOn(background);
+    final background = category.flood(theme.scaffoldBackgroundColor);
+    final foreground = category.foregroundOn(background);
     final buttonForeground = ThemeData.estimateBrightnessForColor(foreground) == Brightness.dark
         ? Colors.white
         : Colors.black;
-    final canAdd = ref.watch(emotionEntriesTodayProvider).value?.length != 3;
+    final canAdd = ref.watch(emotionEntriesTodayProvider).value?.length != EmotionEntry.maxPerDay;
     return Scaffold(
       backgroundColor: background,
       body: SafeArea(
@@ -35,21 +36,23 @@ class EmotionConfirmationScreen extends ConsumerWidget {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  EmotionGlyph(emotion: core.core, size: 80),
+                  EmotionGlyph(emotion: category, size: 80),
                   const SizedBox(height: 20),
                   Text(entry.label,
                       style: theme.textTheme.headlineLarge?.copyWith(color: foreground),
                       textAlign: TextAlign.center),
                   const SizedBox(height: 10),
-                  Text('Logged as ${core.label} → ${entry.specific.label}.',
-                      style: TextStyle(color: foreground), textAlign: TextAlign.center),
+                  Text(
+                      'Logged as ${Emotion.categoryRoot(category).label} → ${entry.specific.label}.',
+                      style: TextStyle(color: foreground),
+                      textAlign: TextAlign.center),
                   const SizedBox(height: 32),
                   Container(
                     width: double.infinity,
                     padding: const EdgeInsets.all(20),
                     decoration: BoxDecoration(
-                        color: core.core.soft(theme.colorScheme.surface),
-                        border: Border.all(color: core.core.border),
+                        color: category.soft(theme.colorScheme.surface),
+                        border: Border.all(color: category.border),
                         borderRadius: BorderRadius.circular(22)),
                     child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                       Text('NOTED ✓',
@@ -80,7 +83,7 @@ class EmotionConfirmationScreen extends ConsumerWidget {
                             onPressed: () => context.go(EmotionPickerScreen.path),
                             style: OutlinedButton.styleFrom(
                                 foregroundColor: foreground,
-                                side: BorderSide(color: core.core.border),
+                                side: BorderSide(color: category.border),
                                 padding: const EdgeInsets.all(17)),
                             child: const Text('Add another feeling'))),
                   ],

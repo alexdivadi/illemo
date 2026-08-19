@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:illemo/src/features/emotions/domain/entities/emotion_entry.dart';
+import 'package:illemo/src/features/emotions/domain/models/emotion_entry_model.dart';
 import 'package:illemo/src/features/emotions/presentation/screens/calendar.dart';
 import 'package:illemo/src/features/emotions/presentation/screens/dashboard.dart';
 import 'package:illemo/src/features/emotions/presentation/screens/emotion_confirmation.dart';
@@ -65,13 +66,13 @@ GoRouter goRouter(Ref ref) {
           path: EmotionPickerScreen.path,
           name: AppRoute.emotionPicker.name,
           builder: (context, state) {
-            return EmotionPickerScreen(entry: state.extra as EmotionEntry?);
+            return EmotionPickerScreen(entry: _emotionEntry(state.extra));
           }),
       GoRoute(
         path: EmotionConfirmationScreen.path,
         name: AppRoute.emotionConfirmation.name,
         builder: (context, state) => EmotionConfirmationScreen(
-          entry: state.extra! as EmotionEntry,
+          entry: _emotionEntry(state.extra)!,
         ),
       ),
       // Stateful navigation based on:
@@ -135,3 +136,7 @@ GoRouter goRouter(Ref ref) {
     ),
   );
 }
+
+EmotionEntry? _emotionEntry(Object? extra) => extra == null
+    ? null
+    : EmotionEntryModel.fromMap((extra as Map).cast<String, Object?>()).toEntity();
