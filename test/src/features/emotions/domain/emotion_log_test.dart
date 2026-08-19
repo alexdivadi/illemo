@@ -1,22 +1,21 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:illemo/src/features/emotions/domain/entities/emotion_log.dart';
-import 'package:illemo/src/features/emotions/domain/models/emotion.dart';
-import 'package:illemo/src/features/emotions/domain/models/emotion_log_model.dart';
+import 'package:illemo/src/features/emotions/domain/entities/emotion_entry.dart';
+import 'package:illemo/src/features/emotions/domain/models/emotion_entry_model.dart';
 
 void main() {
-  test('emotion log survives persistence conversion', () {
+  test('emotion entry survives persistence conversion', () {
     final date = DateTime(2026, 8, 16);
-    final log = EmotionLog.fromEmotions(
-      emotions: const [Emotion.joyful, Emotion.content],
-      date: date,
+    final entry = EmotionEntry(
       id: 'log-1',
+      emotionId: 'joy.content.peaceful',
+      loggedAt: date,
     );
 
-    final restored = EmotionLogModel.fromMap(
-      EmotionLogModel.fromEntity(log, id: 'log-1', timestamp: 1).toMap(),
+    final restored = EmotionEntryModel.fromMap(
+      EmotionEntryModel.fromEntity(entry).toMap(),
     ).toEntity();
 
-    expect(restored, log);
+    expect(restored, entry);
     expect(restored.id, 'log-1');
   });
 }

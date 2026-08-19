@@ -22,6 +22,7 @@ class ReminderService {
       'emotion_reminders',
       'Emotion reminders',
       channelDescription: 'Daily emotion log and streak reminders',
+      icon: 'ic_stat_illemo',
       importance: Importance.high,
       priority: Priority.high,
     ),
@@ -42,7 +43,7 @@ class ReminderService {
 
     await _notifications.initialize(
       settings: const InitializationSettings(
-        android: AndroidInitializationSettings('ic_launcher'),
+        android: AndroidInitializationSettings('ic_stat_illemo'),
         iOS: DarwinInitializationSettings(
           requestAlertPermission: false,
           requestBadgePermission: false,

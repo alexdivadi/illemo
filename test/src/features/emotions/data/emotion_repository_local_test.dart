@@ -1,8 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:illemo/src/data/app_database.dart';
-import 'package:illemo/src/features/emotions/data/repositories/emotion_repository_local.dart';
-import 'package:illemo/src/features/emotions/domain/entities/emotion_log.dart';
-import 'package:illemo/src/features/emotions/domain/models/emotion.dart';
+import 'package:illemo/src/features/emotions/data/repositories/emotion_repository.dart';
+import 'package:illemo/src/features/emotions/domain/entities/emotion_entry.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
 void main() {
@@ -24,33 +23,39 @@ void main() {
     expect(await database.query('emotion_logs'), hasLength(1));
   });
 
-  test('SQLite stores full history, updates streams, and enforces one log per date', () async {
+  test('SQLite stores full history and updates streams', () async {
     final database = await databaseFactoryFfi.openDatabase(
       inMemoryDatabasePath,
       options: OpenDatabaseOptions(version: 1, onCreate: createDatabaseSchema),
     );
-    final repository = EmotionRepositoryLocal(database: database);
+    final repository = EmotionRepository(database);
     addTearDown(() async {
       repository.dispose();
       await database.close();
     });
 
     for (var day = 1; day <= 8; day++) {
-      await repository.addEmotionLog(
-        EmotionLog(emotion1: Emotion.joyful, date: DateTime(2026, 8, day)),
+      await repository.save(
+        EmotionEntry(
+          id: '$day',
+          emotionId: 'joy.hopeful',
+          loggedAt: DateTime(2026, 8, day),
+        ),
       );
     }
-    expect(await repository.getEmotionLogs().first, hasLength(8));
-
-    await repository.addEmotionLog(
-      EmotionLog(emotion1: Emotion.sad, date: DateTime(2026, 8, 8)),
+    expect(
+      await repository.watchRange(DateTime(2026, 8, 1), DateTime(2026, 8, 8)).first,
+      hasLength(8),
     );
-    final logs = await repository
-        .getEmotionLogs(
-          startDate: DateTime(2026, 8, 8),
-          endDate: DateTime(2026, 8, 8),
-        )
-        .first;
-    expect(logs.single.emotion1, Emotion.sad);
+
+    await repository.save(
+      EmotionEntry(
+        id: 'new',
+        emotionId: 'sadness.lonely',
+        loggedAt: DateTime(2026, 8, 8),
+      ),
+    );
+    final entries = await repository.watchRange(DateTime(2026, 8, 8), DateTime(2026, 8, 8)).first;
+    expect(entries.map((entry) => entry.emotionId), ['joy.hopeful', 'sadness.lonely']);
   });
 }
