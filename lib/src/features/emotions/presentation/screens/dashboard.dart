@@ -8,14 +8,27 @@ import 'package:illemo/src/features/journal/data/journal_repository.dart';
 import 'package:illemo/src/features/streak/presentation/streak_widget.dart';
 import 'package:illemo/src/features/streak/service/streak_service.dart';
 
-class DashboardScreen extends ConsumerWidget {
+final dashboardJournalEditing = ValueNotifier(false);
+
+class DashboardScreen extends ConsumerStatefulWidget {
   const DashboardScreen({super.key});
 
   static const path = '/dashboard';
   static const title = 'Dashboard';
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<DashboardScreen> createState() => _DashboardScreenState();
+}
+
+class _DashboardScreenState extends ConsumerState<DashboardScreen> {
+  @override
+  void dispose() {
+    dashboardJournalEditing.value = false;
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final entries = ref.watch(emotionEntriesTodayProvider);
     final journal = ref.watch(journalTodayProvider);
     final streak = ref.watch(streakProvider);
@@ -30,22 +43,20 @@ class DashboardScreen extends ConsumerWidget {
           data: (entries) => Center(
             child: ConstrainedBox(
               constraints: const BoxConstraints(maxWidth: 680),
-              child: ListView(
-                children: [
-                  TodayEmotionLog(
-                    entries: entries,
-                    journalEntry: journal.value,
-                    streakBanner: streak.when(
-                      loading: () => const LinearProgressIndicator(),
-                      error: (_, __) => const Text('Streak unavailable'),
-                      data: StreakWidget.new,
-                    ),
-                    onDelete: (id) => ref.read(emotionEntryServiceProvider).delete(id),
-                    onSaveJournal: ref.read(journalRepositoryProvider).saveToday,
-                  ),
-                  if (entries.length == EmotionEntry.maxPerDay)
-                    _CompletionFooter(hasJournal: journal.value != null),
-                ],
+              child: TodayEmotionLog(
+                entries: entries,
+                journalEntry: journal.value,
+                streakBanner: streak.when(
+                  loading: () => const LinearProgressIndicator(),
+                  error: (_, __) => const Text('Streak unavailable'),
+                  data: StreakWidget.new,
+                ),
+                onDelete: (id) => ref.read(emotionEntryServiceProvider).delete(id),
+                onSaveJournal: ref.read(journalRepositoryProvider).saveToday,
+                onJournalEditingChanged: (editing) => dashboardJournalEditing.value = editing,
+                footer: entries.length == EmotionEntry.maxPerDay
+                    ? _CompletionFooter(hasJournal: journal.value != null)
+                    : null,
               ),
             ),
           ),

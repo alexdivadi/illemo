@@ -5,6 +5,7 @@ import 'package:illemo/src/features/journal/presentation/widgets/today_journal.d
 
 void main() {
   testWidgets('uses pencil to edit, close to cancel, and has no delete button', (tester) async {
+    final editing = <bool>[];
     final entry = JournalEntry(
       id: 'journal',
       body: 'A note',
@@ -12,7 +13,13 @@ void main() {
       updatedAt: DateTime(2026, 8, 18),
     );
     await tester.pumpWidget(MaterialApp(
-      home: Scaffold(body: TodayJournal(entry: entry, onSave: (_) async {})),
+      home: Scaffold(
+        body: TodayJournal(
+          entry: entry,
+          onSave: (_) async {},
+          onEditingChanged: editing.add,
+        ),
+      ),
     ));
 
     expect(find.byIcon(Icons.edit_outlined), findsOneWidget);
@@ -23,5 +30,11 @@ void main() {
 
     expect(find.byIcon(Icons.close), findsOneWidget);
     expect(find.byIcon(Icons.check), findsOneWidget);
+    expect(editing, [true]);
+
+    await tester.tap(find.byIcon(Icons.close));
+    await tester.pump();
+
+    expect(editing, [true, false]);
   });
 }

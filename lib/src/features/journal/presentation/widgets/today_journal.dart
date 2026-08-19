@@ -3,10 +3,18 @@ import 'package:illemo/src/features/journal/domain/entities/journal_entry.dart';
 import 'package:illemo/src/features/journal/presentation/widgets/journal_paper.dart';
 
 class TodayJournal extends StatefulWidget {
-  const TodayJournal({super.key, required this.entry, required this.onSave});
+  const TodayJournal({
+    super.key,
+    required this.entry,
+    required this.onSave,
+    this.initiallyEditing = false,
+    this.onEditingChanged,
+  });
 
   final JournalEntry? entry;
   final Future<void> Function(String body) onSave;
+  final bool initiallyEditing;
+  final ValueChanged<bool>? onEditingChanged;
 
   @override
   State<TodayJournal> createState() => _TodayJournalState();
@@ -14,12 +22,13 @@ class TodayJournal extends StatefulWidget {
 
 class _TodayJournalState extends State<TodayJournal> {
   late final TextEditingController _controller;
-  bool _editing = false;
+  late bool _editing;
   bool _saving = false;
 
   @override
   void initState() {
     super.initState();
+    _editing = widget.initiallyEditing;
     _controller = TextEditingController(text: widget.entry?.body);
   }
 
@@ -40,18 +49,23 @@ class _TodayJournalState extends State<TodayJournal> {
   void _edit() => setState(() {
         _controller.text = widget.entry?.body ?? '';
         _editing = true;
+        widget.onEditingChanged?.call(true);
       });
 
   void _cancel() => setState(() {
         _controller.text = widget.entry?.body ?? '';
         _editing = false;
+        widget.onEditingChanged?.call(false);
       });
 
   Future<void> _save() async {
     setState(() => _saving = true);
     try {
       await widget.onSave(_controller.text);
-      if (mounted) setState(() => _saving = _editing = false);
+      if (mounted) {
+        setState(() => _saving = _editing = false);
+        widget.onEditingChanged?.call(false);
+      }
     } on Object catch (error) {
       if (!mounted) return;
       setState(() => _saving = false);

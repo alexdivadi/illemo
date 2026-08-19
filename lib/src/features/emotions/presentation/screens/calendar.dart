@@ -176,7 +176,9 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
                                     padding: const EdgeInsets.all(Sizes.p8),
                                     child: RichText(
                                       text: TextSpan(
-                                        style: const TextStyle(color: Colors.black54),
+                                        style: TextStyle(
+                                          color: Theme.of(context).colorScheme.onSurfaceVariant,
+                                        ),
                                         children: [
                                           TextSpan(
                                               text: '${(numTotal / totalDays * 100).round()}%',
@@ -196,19 +198,23 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
                                     child: Row(
                                       mainAxisAlignment: MainAxisAlignment.center,
                                       children: [
-                                        const Icon(Icons.emoji_events, color: Colors.grey),
+                                        Icon(
+                                          Icons.emoji_events,
+                                          color: Theme.of(context).colorScheme.onSurfaceVariant,
+                                        ),
                                         gapW4,
                                         RichText(
                                           text: TextSpan(
+                                            style: TextStyle(
+                                              color: Theme.of(context).colorScheme.onSurfaceVariant,
+                                            ),
                                             children: [
                                               TextSpan(
                                                 text: '$numTotal',
-                                                style: const TextStyle(
-                                                    fontSize: 24, color: Colors.grey),
+                                                style: const TextStyle(fontSize: 24),
                                               ),
                                               TextSpan(
                                                 text: ' ${"day".pluralize(numTotal)} logged',
-                                                style: TextStyle(color: Colors.grey),
                                               ),
                                             ],
                                           ),
