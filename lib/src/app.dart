@@ -1,5 +1,6 @@
 import 'dart:developer';
 
+import 'package:firebase_remote_config/firebase_remote_config.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:force_update_helper/force_update_helper.dart';
@@ -32,14 +33,25 @@ class MyApp extends ConsumerWidget {
           onLoaded: (_) => ForceUpdateWidget(
             navigatorKey: goRouter.routerDelegate.navigatorKey,
             forceUpdateClient: ForceUpdateClient(
-              // * Real apps should fetch this from an API endpoint or via
-              // * Firebase Remote Config
-              fetchRequiredVersion: () => Future.value('2.0.0'),
+              fetchRequiredVersion: () async {
+                try {
+                  final config = FirebaseRemoteConfig.instance;
+                  await config.setDefaults(const {'required_version': ''});
+                  await config.fetchAndActivate();
+                  return config.getString('required_version');
+                } catch (error, stackTrace) {
+                  log(
+                    'Could not fetch the required app version.',
+                    error: error,
+                    stackTrace: stackTrace,
+                  );
+                  return '';
+                }
+              },
               // * Example ID from this app: https://fluttertips.dev/
               // * To avoid mistakes, store the ID as an environment variable and
               // * read it with String.fromEnvironment
-              // TODO: update isoAppStoreId
-              iosAppStoreId: '6482293361',
+              iosAppStoreId: '6802886171',
             ),
             allowCancel: false,
             showForceUpdateAlert: (context, allowCancel) => showAlertDialog(
