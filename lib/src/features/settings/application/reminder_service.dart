@@ -78,9 +78,7 @@ class ReminderService {
     if (defaultTargetPlatform == TargetPlatform.android) {
       final android = _notifications
           .resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>();
-      final notificationsAllowed = await android?.requestNotificationsPermission() ?? true;
-      if (!notificationsAllowed) return false;
-      return await android?.requestExactAlarmsPermission() ?? true;
+      return await android?.requestNotificationsPermission() ?? true;
     }
     if (defaultTargetPlatform == TargetPlatform.iOS) {
       return await _notifications
@@ -109,7 +107,7 @@ class ReminderService {
       body: 'Take a moment to complete today’s emotion log.',
       scheduledDate: scheduled,
       notificationDetails: _details,
-      androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
+      androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
       matchDateTimeComponents: DateTimeComponents.time,
       payload: _payload,
     );
@@ -128,7 +126,7 @@ class ReminderService {
       body: 'Complete today’s emotion log before your streak ends.',
       scheduledDate: scheduled,
       notificationDetails: _details,
-      androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
+      androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
       payload: _payload,
     );
   }
