@@ -18,16 +18,20 @@ class SettingsController extends _$SettingsController {
     await _save(state.requireValue.copyWith(darkMode: enabled));
   }
 
-  Future<void> setNotificationDefaults(bool enabled) async {
+  Future<void> requestNotificationPermissionOnce() async {
+    final repository = await ref.read(settingsRepositoryProvider.future);
+    if (repository.wasNotificationPermissionRequested()) return;
+    final enabled = await (await ref.read(reminderServiceProvider.future)).requestPermission();
     final next = state.requireValue.copyWith(
       dailyReminder: enabled,
       streakReminder: enabled,
     );
+    await _save(next);
+    await repository.setNotificationPermissionRequested();
     if (enabled) {
       await (await ref.read(reminderServiceProvider.future))
           .scheduleDaily(next.dailyReminderMinutes);
     }
-    await _save(next);
   }
 
   Future<bool> setDailyReminder(bool enabled) async {

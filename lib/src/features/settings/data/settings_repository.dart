@@ -12,6 +12,7 @@ class SettingsRepository {
   static const _dailyReminderKey = 'settings.dailyReminder';
   static const _dailyReminderMinutesKey = 'settings.dailyReminderMinutes';
   static const _streakReminderKey = 'settings.streakReminder';
+  static const _notificationPermissionRequestedKey = 'settings.notificationPermissionRequested';
 
   final SharedPreferencesWithCache preferences;
 
@@ -21,6 +22,12 @@ class SettingsRepository {
         dailyReminderMinutes: preferences.getInt(_dailyReminderMinutesKey) ?? 8 * 60,
         streakReminder: preferences.getBool(_streakReminderKey) ?? true,
       );
+
+  bool wasNotificationPermissionRequested() =>
+      preferences.getBool(_notificationPermissionRequestedKey) ?? false;
+
+  Future<void> setNotificationPermissionRequested() =>
+      preferences.setBool(_notificationPermissionRequestedKey, true);
 
   Future<void> save(AppSettings settings) async {
     await Future.wait([

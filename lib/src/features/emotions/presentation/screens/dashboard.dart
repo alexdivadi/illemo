@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:illemo/src/features/emotions/data/repositories/emotion_repository.dart';
@@ -5,6 +7,7 @@ import 'package:illemo/src/features/emotions/domain/entities/emotion_entry.dart'
 import 'package:illemo/src/features/emotions/presentation/widgets/today_emotion_log.dart';
 import 'package:illemo/src/features/emotions/service/emotion_entry_service.dart';
 import 'package:illemo/src/features/journal/data/journal_repository.dart';
+import 'package:illemo/src/features/settings/application/settings_controller.dart';
 import 'package:illemo/src/features/streak/presentation/streak_widget.dart';
 import 'package:illemo/src/features/streak/service/streak_service.dart';
 
@@ -21,6 +24,22 @@ class DashboardScreen extends ConsumerStatefulWidget {
 }
 
 class _DashboardScreenState extends ConsumerState<DashboardScreen> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      try {
+        await ref.read(settingsControllerProvider.notifier).requestNotificationPermissionOnce();
+      } on Exception catch (error, stackTrace) {
+        log(
+          'Could not initialize notification reminders.',
+          error: error,
+          stackTrace: stackTrace,
+        );
+      }
+    });
+  }
+
   @override
   void dispose() {
     dashboardJournalEditing.value = false;
