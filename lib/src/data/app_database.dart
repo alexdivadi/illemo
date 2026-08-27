@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:illemo/src/features/emotions/data/emotion_taxonomy_migration.dart';
 import 'package:illemo/src/utils/shared_preferences_provider.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:sqflite/sqflite.dart';
@@ -112,6 +113,7 @@ Future<Database> appDatabase(Ref ref) async {
       await txn.insert('metadata', {'key': 'legacy_emotions_migrated', 'value': '1'});
     });
   }
+  await db.transaction(migrateEmotionTaxonomy);
   ref.onDispose(db.close);
   return db;
 }

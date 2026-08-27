@@ -18,4 +18,15 @@ void main() {
     expect(restored, entry);
     expect(restored.id, 'log-1');
   });
+
+  test('uses taxonomy parents for emotion IDs', () {
+    final entry = EmotionEntry(
+      id: 'log-2',
+      emotionId: 'sadness.tired.drained',
+      loggedAt: DateTime(2026, 8, 25),
+    );
+
+    expect(entry.specific.id, 'sadness.tired');
+    expect(entry.deep?.id, 'sadness.tired.drained');
+  });
 }

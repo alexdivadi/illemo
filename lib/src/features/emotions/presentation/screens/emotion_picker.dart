@@ -298,14 +298,11 @@ class _DeepPicker extends StatelessWidget {
             child: TextButton.icon(
                 onPressed: onBack, icon: const Icon(Icons.arrow_back), label: const Text('Back'))),
         LoggedEmotionIcons(entries: loggedEntries),
-        Wrap(spacing: 6, crossAxisAlignment: WrapCrossAlignment.center, children: [
-          Chip(label: Text(Emotion.categoryRoot(category).label)),
-          const Icon(Icons.chevron_right, size: 18),
-          Chip(label: Text(specific.label)),
-        ]),
         const SizedBox(height: 24),
+        Text(specific.label.toUpperCase(),
+            style: theme.textTheme.labelSmall?.copyWith(color: foreground)),
         Text('Even more precisely?',
-            style: theme.textTheme.headlineSmall?.copyWith(color: foreground)),
+            style: Theme.of(context).textTheme.headlineSmall?.copyWith(color: foreground)),
         const SizedBox(height: 6),
         Text('Optional — pick one, or save as-is below.', style: TextStyle(color: foreground)),
         const SizedBox(height: 26),

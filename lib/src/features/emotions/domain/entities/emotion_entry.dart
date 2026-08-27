@@ -20,11 +20,17 @@ class EmotionEntry extends Equatable {
   Emotion get emotion => Emotion.get(emotionId);
   Category get category => emotion.category;
   Emotion get specific {
-    final parts = emotionId.split('.');
-    return Emotion.get(parts.take(2).join('.'));
+    final parentId = emotion.parentId;
+    if (parentId == null) return emotion;
+    final parent = Emotion.get(parentId);
+    return parent.isCategory ? emotion : parent;
   }
 
-  Emotion? get deep => emotionId.split('.').length > 2 ? emotion : null;
+  Emotion? get deep {
+    final parentId = emotion.parentId;
+    return parentId == null || Emotion.get(parentId).isCategory ? null : emotion;
+  }
+
   String get label => emotion.label;
   DateTime get date => loggedAt;
 
