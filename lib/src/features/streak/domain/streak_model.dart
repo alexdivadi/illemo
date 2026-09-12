@@ -2,8 +2,6 @@ import 'package:flutter/foundation.dart';
 import 'package:illemo/src/features/streak/domain/streak.dart';
 import 'package:uuid/uuid.dart';
 
-typedef StreakID = String;
-
 @immutable
 class StreakModel {
   const StreakModel({

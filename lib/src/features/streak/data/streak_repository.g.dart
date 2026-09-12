@@ -6,26 +6,47 @@ part of 'streak_repository.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$streakRepositoryHash() => r'ed2af13070badeb7c4d9844f402527e6443af795';
+// GENERATED CODE - DO NOT MODIFY BY HAND
+// ignore_for_file: type=lint, type=warning
 
-/// Provider for [StreakRepository].
-///
-/// Requires [UserID] userID.
-///
-/// Copied from [streakRepository].
 @ProviderFor(streakRepository)
-final streakRepositoryProvider = AutoDisposeProvider<StreakRepository>.internal(
-  streakRepository,
-  name: r'streakRepositoryProvider',
-  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-      ? null
-      : _$streakRepositoryHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
+final streakRepositoryProvider = StreakRepositoryProvider._();
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
-typedef StreakRepositoryRef = AutoDisposeProviderRef<StreakRepository>;
-// ignore_for_file: type=lint
-// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package
+final class StreakRepositoryProvider extends $FunctionalProvider<
+    StreakRepository,
+    StreakRepository,
+    StreakRepository> with $Provider<StreakRepository> {
+  StreakRepositoryProvider._()
+      : super(
+          from: null,
+          argument: null,
+          retry: null,
+          name: r'streakRepositoryProvider',
+          isAutoDispose: true,
+          dependencies: null,
+          $allTransitiveDependencies: null,
+        );
+
+  @override
+  String debugGetCreateSourceHash() => _$streakRepositoryHash();
+
+  @$internal
+  @override
+  $ProviderElement<StreakRepository> $createElement($ProviderPointer pointer) =>
+      $ProviderElement(pointer);
+
+  @override
+  StreakRepository create(Ref ref) {
+    return streakRepository(ref);
+  }
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(StreakRepository value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<StreakRepository>(value),
+    );
+  }
+}
+
+String _$streakRepositoryHash() => r'f26d0ec587d82f76895b7ad81e33c88c74870b15';

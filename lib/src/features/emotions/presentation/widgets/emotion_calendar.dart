@@ -1,12 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:illemo/src/constants/app_sizes.dart';
-import 'package:illemo/src/features/emotions/domain/entities/emotion_log.dart';
+import 'package:illemo/src/features/emotions/domain/entities/emotion_entry.dart';
 import 'package:illemo/src/features/emotions/presentation/widgets/calendar_day.dart';
+import 'package:illemo/src/features/journal/domain/entities/journal_entry.dart';
+import 'package:illemo/src/utils/date.dart';
 
 class EmotionCalendar extends StatelessWidget {
-  const EmotionCalendar({super.key, required this.emotionLogs, required this.currentDate});
+  const EmotionCalendar({
+    super.key,
+    required this.emotionEntries,
+    required this.journalEntries,
+    required this.currentDate,
+  });
 
-  final List<EmotionLog> emotionLogs;
+  final List<EmotionEntry> emotionEntries;
+  final List<JournalEntry> journalEntries;
   final DateTime currentDate;
 
   static const months = [
@@ -25,10 +33,35 @@ class EmotionCalendar extends StatelessWidget {
   ];
   static const weekdays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
-  Widget _buildHeader(DateTime currentDate) {
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        HeaderWidget(
+          currentDate: currentDate,
+        ),
+        const WeekdayLabelsWidget(),
+        Expanded(
+            child: CalendarWidget(
+          emotionEntries: emotionEntries,
+          journalEntries: journalEntries,
+          currentDate: currentDate,
+        )),
+      ],
+    );
+  }
+}
+
+class HeaderWidget extends StatelessWidget {
+  const HeaderWidget({super.key, required this.currentDate});
+
+  final DateTime currentDate;
+
+  @override
+  Widget build(BuildContext context) {
     final month = currentDate.month;
     final year = currentDate.year;
-    final monthName = months[month - 1];
+    final monthName = EmotionCalendar.months[month - 1];
 
     return Padding(
       padding: const EdgeInsets.all(Sizes.p8),
@@ -38,36 +71,51 @@ class EmotionCalendar extends StatelessWidget {
       ),
     );
   }
+}
 
-  Widget _buildWeekdayLabels() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceAround,
-      children: weekdays.map((day) {
-        return Expanded(
-          child: Center(
-            child: Text(
-              day,
-              style: TextStyle(fontWeight: FontWeight.bold),
+class WeekdayLabelsWidget extends StatelessWidget {
+  const WeekdayLabelsWidget({super.key});
+
+  @override
+  Widget build(BuildContext context) => Row(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        children: EmotionCalendar.weekdays.map((day) {
+          return Expanded(
+            child: Center(
+              child: Text(
+                day,
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
             ),
-          ),
-        );
-      }).toList(),
-    );
-  }
+          );
+        }).toList(),
+      );
+}
 
-  Widget _buildCalendar(
-    List<EmotionLog> emotionLogs,
-    DateTime currentDate,
-  ) {
+class CalendarWidget extends StatelessWidget {
+  const CalendarWidget({
+    super.key,
+    required this.emotionEntries,
+    required this.journalEntries,
+    required this.currentDate,
+  });
+
+  final List<EmotionEntry> emotionEntries;
+  final List<JournalEntry> journalEntries;
+  final DateTime currentDate;
+
+  @override
+  Widget build(BuildContext context) {
     final daysInMonth = DateUtils.getDaysInMonth(currentDate.year, currentDate.month);
     final firstDayOfMonth = DateTime(currentDate.year, currentDate.month, 1);
     final weekdayOfFirstDay = firstDayOfMonth.weekday;
 
     // Create a set of dates with emotion logs for efficient lookup
-    // Have to truncate the time part of the date because 1 hour keeps getting randomly added
-    final Map<String, EmotionLog> emotionLogDates = {
-      for (var log in emotionLogs) log.date.toIso8601String().split('T').first: log
-    };
+    final emotionEntryDates = <String, List<EmotionEntry>>{};
+    for (final log in emotionEntries) {
+      emotionEntryDates.putIfAbsent(log.date.date, () => []).add(log);
+    }
+    final journalsByDate = {for (final entry in journalEntries) entry.date.date: entry};
 
     // Generate the leading empty days
     final leadingEmptyDays = List.generate(weekdayOfFirstDay, (index) => Container());
@@ -75,11 +123,13 @@ class EmotionCalendar extends StatelessWidget {
     // Generate the days of the month
     final days = List.generate(daysInMonth, (index) {
       final day = firstDayOfMonth.add(Duration(days: index, hours: 0));
-      final emotionLog = emotionLogDates[day.toIso8601String().split('T').first];
+      final emotionEntries = emotionEntryDates[day.date] ?? const [];
       return CalendarDay(
         date: day,
-        emotionLog: emotionLog,
-        isComplete: emotionLog != null && emotionLog.isComplete,
+        emotionEntries: emotionEntries,
+        journalEntry: journalsByDate[day.date],
+        isComplete:
+            emotionEntries.length == EmotionEntry.maxPerDay && journalsByDate.containsKey(day.date),
       );
     });
 
@@ -90,17 +140,6 @@ class EmotionCalendar extends StatelessWidget {
       crossAxisCount: 7,
       physics: const NeverScrollableScrollPhysics(),
       children: calendarDays,
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: [
-        _buildHeader(currentDate),
-        _buildWeekdayLabels(),
-        Expanded(child: _buildCalendar(emotionLogs, currentDate)),
-      ],
     );
   }
 }

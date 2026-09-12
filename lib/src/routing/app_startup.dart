@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:illemo/src/constants/app_sizes.dart';
+import 'package:illemo/src/data/app_database.dart';
 import 'package:illemo/src/features/onboarding/data/onboarding_repository.dart';
 
 part 'app_startup.g.dart';
@@ -18,6 +19,7 @@ Future<void> appStartup(Ref ref) async {
   // await Future.delayed(Duration(seconds: 1));
   // await for all initialization code to be complete before returning
   await ref.watch(onboardingRepositoryProvider.future);
+  await ref.watch(appDatabaseProvider.future);
 }
 
 /// Widget class to manage asynchronous app initialization

@@ -6,26 +6,87 @@ part of 'emotion_repository.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$emotionRepositoryHash() => r'7e8f392600b80416d11d65a7c9db098b8e2e0414';
+// GENERATED CODE - DO NOT MODIFY BY HAND
+// ignore_for_file: type=lint, type=warning
 
-/// Provider for [EmotionRepository].
-/// Requires [UserID] userID.
-///
-/// Copied from [emotionRepository].
 @ProviderFor(emotionRepository)
-final emotionRepositoryProvider =
-    AutoDisposeProvider<EmotionRepository>.internal(
-  emotionRepository,
-  name: r'emotionRepositoryProvider',
-  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-      ? null
-      : _$emotionRepositoryHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
+final emotionRepositoryProvider = EmotionRepositoryProvider._();
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
-typedef EmotionRepositoryRef = AutoDisposeProviderRef<EmotionRepository>;
-// ignore_for_file: type=lint
-// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package
+final class EmotionRepositoryProvider extends $FunctionalProvider<
+    EmotionRepository,
+    EmotionRepository,
+    EmotionRepository> with $Provider<EmotionRepository> {
+  EmotionRepositoryProvider._()
+      : super(
+          from: null,
+          argument: null,
+          retry: null,
+          name: r'emotionRepositoryProvider',
+          isAutoDispose: false,
+          dependencies: null,
+          $allTransitiveDependencies: null,
+        );
+
+  @override
+  String debugGetCreateSourceHash() => _$emotionRepositoryHash();
+
+  @$internal
+  @override
+  $ProviderElement<EmotionRepository> $createElement(
+          $ProviderPointer pointer) =>
+      $ProviderElement(pointer);
+
+  @override
+  EmotionRepository create(Ref ref) {
+    return emotionRepository(ref);
+  }
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(EmotionRepository value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<EmotionRepository>(value),
+    );
+  }
+}
+
+String _$emotionRepositoryHash() => r'b820a896f20d735c04a88fe0b78028b80558d43a';
+
+@ProviderFor(emotionEntriesToday)
+final emotionEntriesTodayProvider = EmotionEntriesTodayProvider._();
+
+final class EmotionEntriesTodayProvider extends $FunctionalProvider<
+        AsyncValue<List<EmotionEntry>>,
+        List<EmotionEntry>,
+        Stream<List<EmotionEntry>>>
+    with
+        $FutureModifier<List<EmotionEntry>>,
+        $StreamProvider<List<EmotionEntry>> {
+  EmotionEntriesTodayProvider._()
+      : super(
+          from: null,
+          argument: null,
+          retry: null,
+          name: r'emotionEntriesTodayProvider',
+          isAutoDispose: true,
+          dependencies: null,
+          $allTransitiveDependencies: null,
+        );
+
+  @override
+  String debugGetCreateSourceHash() => _$emotionEntriesTodayHash();
+
+  @$internal
+  @override
+  $StreamProviderElement<List<EmotionEntry>> $createElement(
+          $ProviderPointer pointer) =>
+      $StreamProviderElement(pointer);
+
+  @override
+  Stream<List<EmotionEntry>> create(Ref ref) {
+    return emotionEntriesToday(ref);
+  }
+}
+
+String _$emotionEntriesTodayHash() =>
+    r'b79dd6a6b96c7765d4dfd867d77252b442180b4c';

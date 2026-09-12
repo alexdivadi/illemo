@@ -1,282 +1,346 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:illemo/src/common_widgets/looping_listview.dart';
-import 'package:illemo/src/constants/app_sizes.dart';
-import 'package:illemo/src/features/emotions/domain/entities/emotion_log.dart';
+import 'package:illemo/src/features/emotions/data/repositories/emotion_repository.dart';
+import 'package:illemo/src/features/emotions/domain/entities/emotion_entry.dart';
+import 'package:illemo/src/features/emotions/domain/models/emotion_entry_model.dart';
 import 'package:illemo/src/features/emotions/domain/models/category.dart';
 import 'package:illemo/src/features/emotions/domain/models/emotion.dart';
-import 'package:illemo/src/features/emotions/presentation/screens/emotion_upload.dart';
+import 'package:illemo/src/features/emotions/presentation/screens/emotion_confirmation.dart';
+import 'package:illemo/src/features/emotions/presentation/widgets/emotion_glyph.dart';
+import 'package:illemo/src/features/emotions/presentation/widgets/logged_emotion_icons.dart';
+import 'package:illemo/src/features/emotions/service/emotion_entry_service.dart';
+import 'package:uuid/uuid.dart';
+
+enum _PickerStep { category, specific, deep }
 
 class EmotionPickerScreen extends ConsumerStatefulWidget {
-  const EmotionPickerScreen({super.key, this.todaysEmotionLog});
+  const EmotionPickerScreen({super.key, this.entry});
 
-  static const path = "/emotion/pick";
-  static const title = "Pick an Emotion";
-
-  final EmotionLog? todaysEmotionLog;
+  static const path = '/emotion/pick';
+  static const title = 'Daily Reflection';
+  final EmotionEntry? entry;
 
   @override
   ConsumerState<EmotionPickerScreen> createState() => _EmotionPickerScreenState();
 }
 
 class _EmotionPickerScreenState extends ConsumerState<EmotionPickerScreen> {
-  late ScrollController _controllerHorizontal;
-  final Map<Category, ScrollController> _verticalControllers = {};
-  final List<Emotion> _selectedEmotions = <Emotion>[];
-  Emotion? currentEmotion;
+  _PickerStep _step = _PickerStep.category;
+  Category? _category;
+  Emotion? _specific;
+  bool _saving = false;
 
-  @override
-  void initState() {
-    super.initState();
-    if (widget.todaysEmotionLog != null) {
-      _selectedEmotions.add(widget.todaysEmotionLog!.emotion1);
-      if (widget.todaysEmotionLog!.emotion2 != null) {
-        _selectedEmotions.add(widget.todaysEmotionLog!.emotion2!);
-      }
-      if (widget.todaysEmotionLog!.emotion3 != null) {
-        _selectedEmotions.add(widget.todaysEmotionLog!.emotion3!);
-      }
-      currentEmotion = widget.todaysEmotionLog!.emotion1;
-    }
-    _controllerHorizontal = ScrollController();
-    for (var category in Category.values) {
-      _verticalControllers[category] = ScrollController();
-    }
-  }
-
-  /// Adds the given [emotion] to the list of selected emotions if the list size is less than the maximum log size.
-  ///
-  /// This method updates the state to include the new emotion and sets the current emotion to null.
-  ///
-  /// [emotion] - The emotion to be added.
-  void pushEmotion(Emotion emotion) {
-    if (_selectedEmotions.length < EmotionLog.logSize && !_selectedEmotions.contains(emotion)) {
-      setState(() {
-        _selectedEmotions.add(emotion);
-        currentEmotion = null;
+  void _selectCategory(Category category) => setState(() {
+        _category = category;
+        _specific = null;
+        _step = _PickerStep.specific;
       });
+
+  void _selectSpecific(Emotion emotion) => setState(() {
+        _specific = emotion;
+        _step = _PickerStep.deep;
+      });
+
+  void _back() {
+    if (_step == _PickerStep.category) {
+      context.pop();
+      return;
     }
-  }
-
-  /// Removes the emotion at the given [index] from the list of selected emotions.
-  ///
-  /// This method updates the state to remove the emotion and sets the current emotion to the removed emotion.
-  ///
-  /// [index] - The index of the emotion to be removed.
-  void _removeEmotion(int index) {
     setState(() {
-      currentEmotion = _selectedEmotions.removeAt(index);
+      _step = _step == _PickerStep.deep ? _PickerStep.specific : _PickerStep.category;
+      if (_step == _PickerStep.category) _category = null;
     });
   }
 
-  /// Submits the selected emotions by navigating to the EmotionUpload screen.
-  ///
-  /// This method passes the list of selected emotion IDs and the ID of today's emotion log as extra data.
-  void _submitEmotions() {
-    context.go(EmotionUpload.path, extra: {
-      'emotionIDs': _selectedEmotions.map((e) => e.id).toList(),
-      'id': widget.todaysEmotionLog?.id,
-    });
+  Future<void> _save([Emotion? deep]) async {
+    if (_saving || _category == null || _specific == null) return;
+    setState(() => _saving = true);
+    final entry = EmotionEntry(
+      id: widget.entry?.id ?? const Uuid().v4(),
+      emotionId: deep?.id ?? _specific!.id,
+      loggedAt: widget.entry?.loggedAt ?? DateTime.now(),
+    );
+    try {
+      await ref.read(emotionEntryServiceProvider).save(entry);
+      if (mounted) {
+        context.go(
+          EmotionConfirmationScreen.path,
+          extra: EmotionEntryModel.fromEntity(entry).toMap(),
+        );
+      }
+    } on Object catch (error) {
+      if (!mounted) return;
+      setState(() => _saving = false);
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('$error')));
+    }
   }
 
   @override
   Widget build(BuildContext context) {
+    final surface = Theme.of(context).scaffoldBackgroundColor;
+    final usedEmotionIds = ref
+            .watch(emotionEntriesTodayProvider)
+            .value
+            ?.where((entry) => entry.id != widget.entry?.id)
+            .map((entry) => entry.emotionId)
+            .toSet() ??
+        const <String>{};
+    final loggedEntries = ref.watch(emotionEntriesTodayProvider).value ?? const <EmotionEntry>[];
     return Scaffold(
-        backgroundColor: Colors.black,
-        appBar: AppBar(
-          title: const Text(EmotionPickerScreen.title),
+      backgroundColor: _category?.flood(surface) ?? surface,
+      body: SafeArea(
+        child: Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 560),
+            child: AnimatedSwitcher(
+              duration: const Duration(milliseconds: 180),
+              child: switch (_step) {
+                _PickerStep.category => _CategoryPicker(
+                    loggedEntries: loggedEntries, onBack: _back, onSelected: _selectCategory),
+                _PickerStep.specific => _SpecificPicker(
+                    category: _category!,
+                    loggedEntries: loggedEntries,
+                    onBack: _back,
+                    onSelected: _selectSpecific),
+                _PickerStep.deep => _DeepPicker(
+                    category: _category!,
+                    specific: _specific!,
+                    loggedEntries: loggedEntries,
+                    saving: _saving,
+                    usedEmotionIds: usedEmotionIds,
+                    onBack: _back,
+                    onSave: _save),
+              },
+            ),
+          ),
         ),
-        body: Stack(children: [
-          _buildEmotionWheels(),
-          Positioned(
-            top: 0,
-            left: 0,
-            right: 0,
-            child: IgnorePointer(
-              child: Container(
-                height: 200,
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                    colors: [Colors.black.withValues(alpha: 0.85), Colors.transparent],
-                  ),
-                ),
-              ),
-            ),
+      ),
+    );
+  }
+}
+
+class _CategoryPicker extends StatelessWidget {
+  const _CategoryPicker({
+    required this.loggedEntries,
+    required this.onBack,
+    required this.onSelected,
+  });
+
+  final List<EmotionEntry> loggedEntries;
+  final VoidCallback onBack;
+  final ValueChanged<Category> onSelected;
+
+  @override
+  Widget build(BuildContext context) => Column(
+        key: const ValueKey('category'),
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(24, 8, 24, 18),
+            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              TextButton.icon(
+                  onPressed: onBack, icon: const Icon(Icons.arrow_back), label: const Text('Back')),
+              const SizedBox(height: 8),
+              LoggedEmotionIcons(entries: loggedEntries),
+              Text('What are you feeling right now?',
+                  style: Theme.of(context).textTheme.headlineMedium),
+              const SizedBox(height: 4),
+              Text('Start broad.', style: Theme.of(context).textTheme.bodyLarge),
+            ]),
           ),
-          Positioned(
-            bottom: 0,
-            left: 0,
-            right: 0,
-            child: IgnorePointer(
-              child: Container(
-                height: 200,
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.bottomCenter,
-                    end: Alignment.topCenter,
-                    colors: [Colors.black.withValues(alpha: 0.85), Colors.transparent],
-                  ),
-                ),
-              ),
-            ),
-          ),
-          if (_selectedEmotions.length >= EmotionLog.logSize)
-            Positioned(
-              top: 0,
-              left: 0,
-              right: 0,
-              bottom: 0,
-              child: Center(
-                child: Container(
-                  color: Colors.black.withValues(alpha: (0.5)),
-                ),
-              ),
-            ),
-          if (_selectedEmotions.length >= EmotionLog.logSize)
-            Center(
-              child: ElevatedButton(
-                onPressed: _submitEmotions,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.lime,
-                  padding: const EdgeInsets.symmetric(horizontal: Sizes.p32, vertical: Sizes.p16),
-                ),
-                child: const Text('Submit :)',
-                    style: TextStyle(fontSize: Sizes.p24, color: Colors.black)),
-              ),
-            ),
-          Positioned(
-            top: 16,
-            left: 16,
-            child: Row(
+          Expanded(
+            child: Column(
               children: [
-                for (int index = 0; index < _selectedEmotions.length; index++)
-                  Padding(
-                    padding: const EdgeInsets.only(right: Sizes.p8),
-                    child: Container(
-                      width: 50,
-                      height: 50,
-                      decoration: BoxDecoration(
-                        color: _selectedEmotions[index].color,
-                        borderRadius: BorderRadius.circular(Sizes.p24),
-                      ),
-                      child: IconButton(
-                        icon: const Icon(Icons.close),
-                        tooltip: 'Remove Emotion',
-                        color: Colors.white,
-                        onPressed: () => _removeEmotion(index),
+                for (final category in Category.values)
+                  Expanded(
+                    child: Semantics(
+                      button: true,
+                      label: Emotion.categoryRoot(category).label,
+                      child: Material(
+                        color: category.cardFor(
+                          Theme.of(context).colorScheme.surface,
+                          Theme.of(context).brightness,
+                        ),
+                        child: InkWell(
+                          onTap: () => onSelected(category),
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 28),
+                            child:
+                                Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+                              Text(Emotion.categoryRoot(category).label,
+                                  style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                                        color: category.foregroundOn(
+                                          category.cardFor(
+                                            Theme.of(context).colorScheme.surface,
+                                            Theme.of(context).brightness,
+                                          ),
+                                        ),
+                                      )),
+                              EmotionGlyph(emotion: category, size: 44),
+                            ]),
+                          ),
+                        ),
                       ),
                     ),
                   ),
               ],
             ),
           ),
-        ]),
-        floatingActionButton: Row(
-          mainAxisAlignment: MainAxisAlignment.end,
-          children: [
-            if (currentEmotion != null && _selectedEmotions.length < 3)
-              FloatingActionButton(
-                heroTag: 'addEmotion',
-                tooltip: 'Add Emotion',
-                backgroundColor: Colors.lightGreen,
-                foregroundColor: Colors.white,
-                onPressed: () => pushEmotion(currentEmotion!),
-                child: const Icon(Icons.add),
-              ),
-            const SizedBox(width: Sizes.p16),
-            if (_selectedEmotions.isNotEmpty && _selectedEmotions.length < EmotionLog.logSize)
-              FloatingActionButton(
-                heroTag: 'submitEmotions',
-                tooltip: 'Submit Emotions',
-                backgroundColor: Colors.indigo,
-                foregroundColor: Colors.white,
-                onPressed: _submitEmotions,
-                child: const Icon(Icons.arrow_forward),
-              ),
-          ],
-        ));
-  }
-
-  Widget _buildEmotionWheels() => ListView.builder(
-        controller: _controllerHorizontal,
-        physics: const ClampingScrollPhysics(),
-        scrollDirection: Axis.horizontal,
-        itemCount: Category.values.length + 2, // Add extra items for padding
-        itemBuilder: (context, categoryIndex) {
-          if (categoryIndex == 0 || categoryIndex == Category.values.length + 1) {
-            return SizedBox(width: MediaQuery.of(context).size.width / 2 - 100); // Add padding
-          }
-          final category = Category.values[categoryIndex - 1];
-          final emotions = Emotion.values.where((emotion) => emotion.category == category).toList();
-          return SizedBox(
-            width: 200,
-            child: LoopingListView(
-                controller: _verticalControllers[category],
-                direction: Axis.vertical,
-                children: emotions.map((emotion) {
-                  return InkWell(
-                    onLongPress: () => pushEmotion(emotion),
-                    onTap: _selectedEmotions.contains(emotion)
-                        ? null
-                        : () {
-                            log('Selected emotion: $emotion');
-                            setState(() {
-                              currentEmotion = emotion;
-                            });
-                            _controllerHorizontal.animateTo(
-                              _controllerHorizontal.position.minScrollExtent +
-                                  200 * category.index.toDouble(),
-                              duration: const Duration(milliseconds: 300),
-                              curve: Curves.easeInOut,
-                            );
-                            _verticalControllers[category]!.animateToItem(
-                              emotions.indexOf(emotion),
-                              itemExtent: 200,
-                              itemCount: emotions.length,
-                              duration: const Duration(milliseconds: 500),
-                              curve: Curves.easeInOut,
-                            );
-                          },
-                    child: Container(
-                      width: 200,
-                      height: 200,
-                      decoration: BoxDecoration(
-                        color: _selectedEmotions.contains(emotion) ? Colors.grey : emotion.color,
-                        border: currentEmotion == emotion
-                            ? Border.all(color: Colors.white, width: 3)
-                            : null,
-                      ),
-                      child: Center(
-                        child: Text(
-                          '$emotion',
-                          style: TextStyle(
-                            fontSize: Sizes.p24,
-                            fontWeight:
-                                currentEmotion == emotion ? FontWeight.bold : FontWeight.normal,
-                            color: _selectedEmotions.contains(emotion)
-                                ? Colors.black
-                                : emotion.textColor,
-                          ),
-                        ),
-                      ),
-                    ),
-                  );
-                }).toList()),
-          );
-        },
+          const Padding(
+            padding: EdgeInsets.all(18),
+            child: Text('No feeling is good or bad — they’re all welcome here.',
+                textAlign: TextAlign.center),
+          ),
+        ],
       );
+}
+
+class _SpecificPicker extends StatelessWidget {
+  const _SpecificPicker({
+    required this.category,
+    required this.loggedEntries,
+    required this.onBack,
+    required this.onSelected,
+  });
+
+  final Category category;
+  final List<EmotionEntry> loggedEntries;
+  final VoidCallback onBack;
+  final ValueChanged<Emotion> onSelected;
 
   @override
-  void dispose() {
-    _controllerHorizontal.dispose();
-    for (var controller in _verticalControllers.values) {
-      controller.dispose();
-    }
-    super.dispose();
+  Widget build(BuildContext context) {
+    final feelings = Emotion.specificsFor(category);
+    final theme = Theme.of(context);
+    final background = category.flood(theme.scaffoldBackgroundColor);
+    final foreground = category.foregroundOn(background);
+    return Padding(
+      key: const ValueKey('specific'),
+      padding: const EdgeInsets.fromLTRB(20, 8, 20, 32),
+      child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+        Align(
+            alignment: Alignment.centerLeft,
+            child: TextButton.icon(
+                onPressed: onBack, icon: const Icon(Icons.arrow_back), label: const Text('Back'))),
+        LoggedEmotionIcons(entries: loggedEntries),
+        Row(children: [
+          EmotionGlyph(emotion: category, size: 40),
+          const SizedBox(width: 14),
+          Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Text(Emotion.categoryRoot(category).label.toUpperCase(),
+                style: theme.textTheme.labelSmall?.copyWith(color: foreground)),
+            Text('More specifically…',
+                style: Theme.of(context).textTheme.headlineSmall?.copyWith(color: foreground)),
+          ]),
+        ]),
+        const SizedBox(height: 24),
+        Expanded(
+          child: GridView.builder(
+            itemCount: feelings.length,
+            gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
+                maxCrossAxisExtent: 250,
+                childAspectRatio: 1.55,
+                crossAxisSpacing: 10,
+                mainAxisSpacing: 10),
+            itemBuilder: (context, index) {
+              final feeling = feelings[index];
+              return OutlinedButton(
+                style: OutlinedButton.styleFrom(
+                    backgroundColor: category.soft(theme.colorScheme.surface),
+                    foregroundColor: foreground,
+                    side: BorderSide(color: category.border)),
+                onPressed: () => onSelected(feeling),
+                child: Text(feeling.label,
+                    style: Theme.of(context).textTheme.titleMedium?.copyWith(color: foreground)),
+              );
+            },
+          ),
+        ),
+      ]),
+    );
+  }
+}
+
+class _DeepPicker extends StatelessWidget {
+  const _DeepPicker(
+      {required this.category,
+      required this.specific,
+      required this.loggedEntries,
+      required this.saving,
+      required this.usedEmotionIds,
+      required this.onBack,
+      required this.onSave});
+
+  final Category category;
+  final Emotion specific;
+  final List<EmotionEntry> loggedEntries;
+  final bool saving;
+  final Set<String> usedEmotionIds;
+  final VoidCallback onBack;
+  final ValueChanged<Emotion?> onSave;
+
+  @override
+  Widget build(BuildContext context) {
+    final feelings = Emotion.childrenOf(specific.id);
+    final theme = Theme.of(context);
+    final background = category.flood(theme.scaffoldBackgroundColor);
+    final foreground = category.foregroundOn(background);
+    final buttonForeground = ThemeData.estimateBrightnessForColor(foreground) == Brightness.dark
+        ? Colors.white
+        : Colors.black;
+    return Padding(
+      key: const ValueKey('deep'),
+      padding: const EdgeInsets.fromLTRB(20, 8, 20, 32),
+      child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+        Align(
+            alignment: Alignment.centerLeft,
+            child: TextButton.icon(
+                onPressed: onBack, icon: const Icon(Icons.arrow_back), label: const Text('Back'))),
+        LoggedEmotionIcons(entries: loggedEntries),
+        const SizedBox(height: 24),
+        Text(specific.label.toUpperCase(),
+            style: theme.textTheme.labelSmall?.copyWith(color: foreground)),
+        Text('Even more precisely?',
+            style: Theme.of(context).textTheme.headlineSmall?.copyWith(color: foreground)),
+        const SizedBox(height: 6),
+        Text('Optional — pick one, or save as-is below.', style: TextStyle(color: foreground)),
+        const SizedBox(height: 26),
+        Expanded(
+          child: ListView.separated(
+            itemCount: feelings.length,
+            separatorBuilder: (_, __) => const SizedBox(height: 10),
+            itemBuilder: (context, index) {
+              final feeling = feelings[index];
+              final disabled = saving || usedEmotionIds.contains(feeling.id);
+              return OutlinedButton.icon(
+                style: OutlinedButton.styleFrom(
+                    alignment: Alignment.centerLeft,
+                    padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 18),
+                    backgroundColor: category.soft(theme.colorScheme.surface),
+                    foregroundColor: foreground,
+                    disabledForegroundColor: theme.disabledColor,
+                    side: BorderSide(color: disabled ? theme.disabledColor : category.border)),
+                onPressed: disabled ? null : () => onSave(feeling),
+                icon: const Icon(Icons.circle_outlined, size: 12),
+                label: Text(feeling.label,
+                    style: Theme.of(context)
+                        .textTheme
+                        .titleMedium
+                        ?.copyWith(color: disabled ? theme.disabledColor : foreground)),
+              );
+            },
+          ),
+        ),
+        FilledButton(
+          onPressed: saving || usedEmotionIds.contains(specific.id) ? null : () => onSave(null),
+          style: FilledButton.styleFrom(
+              backgroundColor: foreground,
+              foregroundColor: buttonForeground,
+              padding: const EdgeInsets.all(17)),
+          child: Text(saving ? 'Saving…' : 'Save as “${specific.label}”'),
+        ),
+      ]),
+    );
   }
 }

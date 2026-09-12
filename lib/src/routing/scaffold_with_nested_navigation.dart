@@ -1,6 +1,7 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:illemo/src/features/emotions/presentation/screens/dashboard.dart';
 
 import 'package:illemo/src/localization/string_hardcoded.dart';
 
@@ -55,33 +56,44 @@ class ScaffoldWithNavigationBar extends StatelessWidget {
   final ValueChanged<int> onDestinationSelected;
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: body,
-      bottomNavigationBar: NavigationBar(
-        selectedIndex: currentIndex,
-        destinations: [
-          // products
-          NavigationDestination(
-            icon: const Icon(Icons.dashboard_outlined),
-            selectedIcon: const Icon(Icons.dashboard),
-            label: 'Dashboard'.hardcoded,
+  Widget build(BuildContext context) => ValueListenableBuilder(
+        valueListenable: dashboardJournalEditing,
+        builder: (context, editing, _) => Scaffold(
+          body: body,
+          bottomNavigationBar: AnimatedSize(
+            duration: const Duration(milliseconds: 250),
+            curve: Curves.easeInOut,
+            child: AnimatedSwitcher(
+              duration: const Duration(milliseconds: 250),
+              child: editing
+                  ? const SizedBox.shrink(key: ValueKey('hidden-navigation'))
+                  : NavigationBar(
+                      key: const ValueKey('navigation-bar'),
+                      selectedIndex: currentIndex,
+                      destinations: [
+                        // products
+                        NavigationDestination(
+                          icon: const Icon(Icons.dashboard_outlined),
+                          selectedIcon: const Icon(Icons.dashboard),
+                          label: 'Dashboard'.hardcoded,
+                        ),
+                        NavigationDestination(
+                          icon: const Icon(Icons.calendar_month_outlined),
+                          selectedIcon: const Icon(Icons.calendar_month),
+                          label: 'Calendar'.hardcoded,
+                        ),
+                        NavigationDestination(
+                          icon: const Icon(Icons.settings_outlined),
+                          selectedIcon: const Icon(Icons.settings),
+                          label: 'Settings'.hardcoded,
+                        ),
+                      ],
+                      onDestinationSelected: onDestinationSelected,
+                    ),
+            ),
           ),
-          NavigationDestination(
-            icon: const Icon(Icons.calendar_month_outlined),
-            selectedIcon: const Icon(Icons.calendar_month),
-            label: 'Calendar'.hardcoded,
-          ),
-          NavigationDestination(
-            icon: const Icon(Icons.person_outline),
-            selectedIcon: const Icon(Icons.person),
-            label: 'Account'.hardcoded,
-          ),
-        ],
-        onDestinationSelected: onDestinationSelected,
-      ),
-    );
-  }
+        ),
+      );
 }
 
 class ScaffoldWithNavigationRail extends StatelessWidget {
@@ -96,39 +108,46 @@ class ScaffoldWithNavigationRail extends StatelessWidget {
   final ValueChanged<int> onDestinationSelected;
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: Row(
-        children: [
-          NavigationRail(
-            selectedIndex: currentIndex,
-            onDestinationSelected: onDestinationSelected,
-            labelType: NavigationRailLabelType.all,
-            destinations: <NavigationRailDestination>[
-              NavigationRailDestination(
-                icon: const Icon(Icons.dashboard_outlined),
-                selectedIcon: const Icon(Icons.dashboard),
-                label: Text('Dashboard'.hardcoded),
+  Widget build(BuildContext context) => ValueListenableBuilder(
+        valueListenable: dashboardJournalEditing,
+        builder: (context, editing, _) => Scaffold(
+          body: Row(
+            children: [
+              AnimatedSize(
+                duration: const Duration(milliseconds: 250),
+                child: AnimatedSwitcher(
+                  duration: const Duration(milliseconds: 250),
+                  child: editing
+                      ? const SizedBox.shrink(key: ValueKey('hidden-navigation'))
+                      : NavigationRail(
+                          key: const ValueKey('navigation-rail'),
+                          selectedIndex: currentIndex,
+                          onDestinationSelected: onDestinationSelected,
+                          labelType: NavigationRailLabelType.all,
+                          destinations: <NavigationRailDestination>[
+                            NavigationRailDestination(
+                              icon: const Icon(Icons.dashboard_outlined),
+                              selectedIcon: const Icon(Icons.dashboard),
+                              label: Text('Dashboard'.hardcoded),
+                            ),
+                            NavigationRailDestination(
+                              icon: const Icon(Icons.calendar_month_outlined),
+                              selectedIcon: const Icon(Icons.calendar_month),
+                              label: Text('Calendar'.hardcoded),
+                            ),
+                            NavigationRailDestination(
+                              icon: const Icon(Icons.settings_outlined),
+                              selectedIcon: const Icon(Icons.settings),
+                              label: Text('Settings'.hardcoded),
+                            ),
+                          ],
+                        ),
+                ),
               ),
-              NavigationRailDestination(
-                icon: const Icon(Icons.calendar_month_outlined),
-                selectedIcon: const Icon(Icons.calendar_month),
-                label: Text('Calendar'.hardcoded),
-              ),
-              NavigationRailDestination(
-                icon: const Icon(Icons.person_outline),
-                selectedIcon: const Icon(Icons.person),
-                label: Text('Account'.hardcoded),
-              ),
+              if (!editing) const VerticalDivider(thickness: 1, width: 1),
+              Expanded(child: body),
             ],
           ),
-          const VerticalDivider(thickness: 1, width: 1),
-          // This is the main content.
-          Expanded(
-            child: body,
-          ),
-        ],
-      ),
-    );
-  }
+        ),
+      );
 }

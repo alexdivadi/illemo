@@ -2,35 +2,21 @@
 
 An emotion journaling app.
 
-![](/.github/images/time-tracker-screenshots.png)
-
-This is intended as a **reference app** based on my [Riverpod Architecture](https://codewithandrea.com/articles/flutter-app-architecture-riverpod-introduction/).
-
-> **Note**: this project used to be called "Started Architecture for Flutter & Firebase" (based on this [old article](https://codewithandrea.com/videos/starter-architecture-flutter-firebase/)). As of January 2023, it follows my updated [Riverpod Architecture](https://codewithandrea.com/articles/flutter-app-architecture-riverpod-introduction/), using the latest packages.
-
-<!-- ## Flutter web preview
-
-A Flutter web preview of the app is available here:
-
-- [Time Tracker | Flutter web demo](https://starter-architecture-flutter.web.app) -->
-
 ## Features
 
 - **Simple onboarding page**
-- **Full authentication flow** (using email & password)
-- **Jobs**: users can view, create, edit, and delete their own private jobs (each job has a name and hourly rate)
-- **Entries**: for each job, user can view, create, edit, and delete the corresponding entries (an entry is a task with a start and end time, with an optional comment)
-- **A report page** that shows a daily breakdown of all jobs, hours worked and pay, along with the totals.
+- **Optional authentication** for future backup and synchronization
+- **Daily emotion logging**
+- **Emotion history and monthly calendar**
+- **Emotion trends and streaks**
 
-All the data is persisted with Firestore and is kept in sync across multiple devices.
+Emotion history and streaks are stored locally in SQLite and work without an account or network connection.
 
 ## Roadmap
 
 - [ ] Add missing tests
 - [x] Stateful Nested Navigation (available since GoRouter 7.1)
-- [ ] Use controllers / notifiers consistently across the app (some code still needs to be updated)
 - [ ] Add localization
-- [ ] Use the new Firebase UI packages where useful
 - [ ] Responsive UI
 
 > This is a tentative roadmap. There is no ETA for any of the points above. This is a low priority project and I don't have much time to maintain it.
@@ -53,14 +39,12 @@ More more info on Riverpod, read this:
 These are the main packages used in the app:
 
 - [Flutter Riverpod](https://pub.dev/packages/flutter_riverpod) for data caching, dependency injection, and more
-- [Riverpod Generator](https://pub.dev/packages/riverpod_generator) and [Riverpod Lint](https://pub.dev/packages/riverpod_lint) for the latest Riverpod APIs
+- [Riverpod Generator](https://pub.dev/packages/riverpod_generator) for generated providers
 - [GoRouter](https://pub.dev/packages/go_router) for navigation
 - [Firebase Auth](https://pub.dev/packages/firebase_auth) and [Firebase UI Auth](https://pub.dev/packages/firebase_ui_auth) for authentication
-- [Cloud Firestore](https://pub.dev/packages/cloud_firestore) as a realtime database
-- [Firebase UI for Firestore](https://pub.dev/packages/firebase_ui_firestore) for the `FirestoreListView` widget with pagination support
-- [RxDart](https://pub.dev/packages/rxdart) for combining multiple Firestore collections as needed
+- [Firebase Analytics](https://pub.dev/packages/firebase_analytics) for automatic app usage events
+- [sqflite](https://pub.dev/packages/sqflite) for local emotion history and streak storage
 - [Intl](https://pub.dev/packages/intl) for currency, date, time formatting
-- [Mocktail](https://pub.dev/packages/mocktail) for testing
 - [Equatable](https://pub.dev/packages/equatable) to reduce boilerplate code in model classes
 
 See the [pubspec.yaml](pubspec.yaml) file for the complete list.
@@ -71,7 +55,12 @@ To use this project with Firebase, follow these steps:
 
 - Create a new project with the Firebase console
 - Enable Firebase Authentication, along with the Email/Password Authentication Sign-in provider in the Firebase Console (Authentication > Sign-in method > Email/Password > Edit > Enable > Save)
-- Enable Cloud Firestore
+- Enable Google Analytics in both the development and production Firebase projects
+
+Analytics uses the existing flavor-specific Firebase initialization, logs app
+opens, and collects the SDK's automatic events. No journal text or emotion records
+are sent as custom Analytics events. Verify collection in Analytics DebugView
+after rebuilding the app. See the [Firebase Analytics setup guide](https://firebase.google.com/docs/analytics/flutter/get-started).
 
 Then, follow one of the two approaches below. 👇
 

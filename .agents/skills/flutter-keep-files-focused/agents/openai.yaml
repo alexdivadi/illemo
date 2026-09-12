@@ -1,0 +1,4 @@
+interface:
+  display_name: "Keep Flutter Files Focused"
+  short_description: "Enforce project architecture and focused files"
+  default_prompt: "Use $flutter-keep-files-focused to implement this change without creating oversized or misplaced files."
