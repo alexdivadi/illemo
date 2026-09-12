@@ -126,23 +126,25 @@ class _TodayJournalState extends State<TodayJournal> {
               ),
             ],
       child: _editing
-          ? TextField(
-              controller: _controller,
-              autofocus: true,
-              minLines: null,
-              maxLines: null,
-              expands: true,
-              cursorColor: const Color(0xFF8A6040),
-              decoration: const InputDecoration(
-                border: InputBorder.none,
-                enabledBorder: InputBorder.none,
-                focusedBorder: InputBorder.none,
-                hintText: 'What’s on your mind today…',
-                hintStyle: TextStyle(color: Color(0xFFC0A880)),
-                contentPadding: EdgeInsets.zero,
-                isDense: true,
+          ? Expanded(
+              child: TextField(
+                controller: _controller,
+                autofocus: true,
+                minLines: null,
+                maxLines: null,
+                expands: true,
+                cursorColor: const Color(0xFF8A6040),
+                decoration: const InputDecoration(
+                  border: InputBorder.none,
+                  enabledBorder: InputBorder.none,
+                  focusedBorder: InputBorder.none,
+                  hintText: 'What’s on your mind today…',
+                  hintStyle: TextStyle(color: Color(0xFFC0A880)),
+                  contentPadding: EdgeInsets.zero,
+                  isDense: true,
+                ),
+                style: JournalPaper.noteStyle,
               ),
-              style: JournalPaper.noteStyle,
             )
           : Text(widget.entry!.body, style: JournalPaper.noteStyle),
     );
