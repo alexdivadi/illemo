@@ -1,5 +1,6 @@
 import 'dart:developer';
 
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:illemo/env/flavor.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:illemo/firebase_options_dev.dart' as dev;
@@ -16,6 +17,7 @@ Future<void> initializeFirebaseApp() async {
     await Firebase.initializeApp(
       options: firebaseOptions,
     );
+    await FirebaseAnalytics.instance.logAppOpen();
   } catch (e) {
     log(e.toString(), error: e);
   }

@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:illemo/src/data/app_database.dart';
+import 'package:illemo/src/features/emotions/data/emotion_history_json.dart';
 import 'package:illemo/src/features/emotions/domain/entities/emotion_entry.dart';
 import 'package:illemo/src/features/emotions/domain/models/emotion_entry_model.dart';
 import 'package:illemo/src/utils/date.dart';
@@ -14,6 +15,55 @@ class EmotionRepository {
 
   final Database database;
   final _changes = StreamController<void>.broadcast();
+
+  Future<String> exportHistory({DateTime? startDate, DateTime? endDate}) async {
+    if (startDate != null && endDate != null && startDate.date.compareTo(endDate.date) > 0) {
+      throw ArgumentError('startDate must not be after endDate.');
+    }
+    final conditions = <String>[
+      if (startDate != null) 'date >= ?',
+      if (endDate != null) 'date <= ?',
+    ];
+    final rows = await database.query(
+      'emotion_entries',
+      where: conditions.isEmpty ? null : conditions.join(' AND '),
+      whereArgs: [if (startDate != null) startDate.date, if (endDate != null) endDate.date],
+      orderBy: 'date ASC, logged_at ASC, id ASC',
+    );
+    return EmotionHistoryJson.encode(rows);
+  }
+
+  Future<int> importHistory(String json, {bool override = false}) async {
+    final rows = EmotionHistoryJson.decode(json);
+    final days = <String, List<Map<String, Object?>>>{};
+    for (final row in rows) {
+      days.putIfAbsent(row['date']! as String, () => []).add(row);
+    }
+    final imported = await database.transaction((txn) async {
+      var count = 0;
+      for (final day in days.entries) {
+        final existing = await txn.query(
+          'emotion_entries',
+          columns: ['id'],
+          where: 'date = ?',
+          whereArgs: [day.key],
+          limit: 1,
+        );
+        if (existing.isNotEmpty && !override) continue;
+        if (override) {
+          await txn.delete('emotion_entries', where: 'date = ?', whereArgs: [day.key]);
+        }
+        for (final row in day.value) {
+          // Abort on ID conflicts: never replace a record belonging to another day.
+          await txn.insert('emotion_entries', row, conflictAlgorithm: ConflictAlgorithm.abort);
+          count++;
+        }
+      }
+      return count;
+    });
+    if (imported > 0) _changes.add(null);
+    return imported;
+  }
 
   Stream<List<EmotionEntry>> watchToday() {
     final today = DateTime.now();

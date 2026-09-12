@@ -42,7 +42,8 @@ These are the main packages used in the app:
 - [Riverpod Generator](https://pub.dev/packages/riverpod_generator) for generated providers
 - [GoRouter](https://pub.dev/packages/go_router) for navigation
 - [Firebase Auth](https://pub.dev/packages/firebase_auth) and [Firebase UI Auth](https://pub.dev/packages/firebase_ui_auth) for authentication
-- [Cloud Firestore](https://pub.dev/packages/cloud_firestore) as a realtime database
+- [Firebase Analytics](https://pub.dev/packages/firebase_analytics) for automatic app usage events
+- [sqflite](https://pub.dev/packages/sqflite) for local emotion history and streak storage
 - [Intl](https://pub.dev/packages/intl) for currency, date, time formatting
 - [Equatable](https://pub.dev/packages/equatable) to reduce boilerplate code in model classes
 
@@ -54,7 +55,12 @@ To use this project with Firebase, follow these steps:
 
 - Create a new project with the Firebase console
 - Enable Firebase Authentication, along with the Email/Password Authentication Sign-in provider in the Firebase Console (Authentication > Sign-in method > Email/Password > Edit > Enable > Save)
-- Enable Cloud Firestore
+- Enable Google Analytics in both the development and production Firebase projects
+
+Analytics uses the existing flavor-specific Firebase initialization, logs app
+opens, and collects the SDK's automatic events. No journal text or emotion records
+are sent as custom Analytics events. Verify collection in Analytics DebugView
+after rebuilding the app. See the [Firebase Analytics setup guide](https://firebase.google.com/docs/analytics/flutter/get-started).
 
 Then, follow one of the two approaches below. 👇
 

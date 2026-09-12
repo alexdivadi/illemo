@@ -129,8 +129,9 @@ class _TodayJournalState extends State<TodayJournal> {
           ? TextField(
               controller: _controller,
               autofocus: true,
-              minLines: 6,
-              maxLines: 6,
+              minLines: null,
+              maxLines: null,
+              expands: true,
               cursorColor: const Color(0xFF8A6040),
               decoration: const InputDecoration(
                 border: InputBorder.none,

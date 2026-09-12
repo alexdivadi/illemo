@@ -136,6 +136,7 @@ class _TodayEmotionLogState extends State<TodayEmotionLog> {
                                 onSave: widget.onSaveJournal,
                                 onEditingChanged: _setJournalEditing,
                               ),
+                              const SizedBox(height: 12),
                               if (widget.entries.length < EmotionEntry.maxPerDay)
                                 FilledButton.icon(
                                     onPressed: () => context.push(EmotionPickerScreen.path),
